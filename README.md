@@ -17,6 +17,12 @@ poetry install
 poetry shell
 ```
 
+### Set Postgres Timezone as Taiwan
+
+```shell
+ALTER DATABASE your_database SET TIMEZONE TO 'Asia/Taipei';
+```
+
 ### Run Server
 
 ```shell

@@ -1,4 +1,7 @@
 from tortoise import fields, models
+import pytz
+
+tz = pytz.timezone("Asia/Taipei")
 
 class Round(models.Model):
     """
@@ -11,3 +14,9 @@ class Round(models.Model):
 
     def __str__(self) -> str:
         return f"回合:{self.id}"
+
+    def get_local_start_time(self):
+        return self.start_time.replace(tzinfo=pytz.utc).astimezone(tz)
+
+    def get_local_end_time(self):
+        return self.end_time.replace(tzinfo=pytz.utc).astimezone(tz)
