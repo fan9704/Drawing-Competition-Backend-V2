@@ -1,0 +1,10 @@
+### ENV
+.env
+.venv
+postgres-data
+pgadmin_data
+
+### IDEA
+.idea
+
+

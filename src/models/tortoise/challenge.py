@@ -1,0 +1,29 @@
+from tortoise import fields, models
+
+
+class Challenge(models.Model):
+    """
+    挑戰 Model
+    """
+    DIFFICULTY_OPTIONS = [
+        ("easy", "easy"),
+        ("medium", "medium"),
+        ("hard", "hard"),
+    ]
+
+    id = fields.IntField(pk=True)
+    title = fields.CharField(max_length=255, default="題目標題", description="題目標題")
+    description = fields.TextField(description="題目描述")
+    # 注意：Tortoise 沒有內建的 ImageField，你可以將圖片路徑以字串儲存，
+    # 或使用其他套件處理檔案上傳
+    image_url = fields.CharField(
+        max_length=255, default="images/default.png", description="題目圖片"
+    )
+    difficulty = fields.CharField(
+        max_length=255, choices=DIFFICULTY_OPTIONS, default="easy", description="難度"
+    )
+    round = fields.ForeignKeyField("models.Round", on_delete=fields.CASCADE, description="回合")
+    is_valid = fields.BooleanField(default=True, description="是否有效")
+
+    def __str__(self):
+        return f"題目:{self.id}-{self.description}"
