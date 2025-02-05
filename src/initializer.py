@@ -1,8 +1,9 @@
+import datetime
 from inspect import getmembers
 
 from fastapi import FastAPI
 from tortoise.contrib.starlette import register_tortoise
-
+from tortoise.timezone import localtime
 from src.configs import tortoise_config
 from src.utils.api.router import TypedAPIRouter
 
@@ -32,11 +33,23 @@ def init_db(app: FastAPI):
     :param app:
     :return:
     """
+    config = {
+        "use_tz": True,
+        "timezone": "Asia/Taipei",
+        "connections": {
+            "default": tortoise_config.db_url
+        },
+        "apps":{
+            "models": {
+                "models": ["src.models.tortoise"],
+                'default_connection': 'default',
+            }
+
+        }
+    }
     register_tortoise(
         app,
-        db_url=tortoise_config.db_url,
-        generate_schemas=tortoise_config.generate_schemas,
-        modules=tortoise_config.modules,
+        config=config,
     )
 
 def init_router(app:FastAPI):

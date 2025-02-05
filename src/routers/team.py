@@ -1,9 +1,11 @@
 from typing import Optional, List
 
-from fastapi import APIRouter, HTTPException,Request,Response
-from src.repositories import TeamRepository
+from fastapi import APIRouter, Response
+
+from src.models.pydantic import Team, TeamAuthRequest, TeamAuthResponse
 from src.models.tortoise import Team as ITeam
-from src.models.pydantic import Team
+from src.repositories import TeamRepository
+from src.utils import jwt
 
 router = APIRouter()
 repository: TeamRepository = TeamRepository(ITeam)
@@ -22,10 +24,22 @@ async def get() -> list[Team]:
             response_model=Optional[Team],
             response_description="Your Team")
 async def get_team_by_token(token: str):
-    team = await Team.filter(token=token).first()
+    team = await ITeam.filter(token=token).first()
     if not team:
-        raise HTTPException(status_code=400, detail="Token is invalid")
-    return Response(
-        team,
-        status_code=200,
+        return Response(status_code=400, content="Token is invalid")
+    return team
+
+
+@router.post("/auth", response_model=TeamAuthResponse)
+async def auth_team(request: TeamAuthRequest):
+    team = await ITeam.filter(token=request.token).first()
+    status = False
+    token = None
+
+    if team:
+        token = jwt.create_access_token(team)
+    return TeamAuthResponse(
+        status=status,
+        team=team,
+        access_token=token
     )

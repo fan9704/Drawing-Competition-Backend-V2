@@ -20,3 +20,11 @@ class Round(models.Model):
 
     def get_local_end_time(self):
         return self.end_time.replace(tzinfo=pytz.utc).astimezone(tz)
+
+    def set_local_start_time(self):
+        self.start_time.replace(tzinfo=pytz.utc).astimezone(tz)
+        self.save()
+
+    def set_local_end_time(self):
+        self.end_time.replace(tzinfo=pytz.utc).astimezone(tz)
+        self.save()
