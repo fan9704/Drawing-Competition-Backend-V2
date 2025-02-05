@@ -4,6 +4,7 @@ from tortoise.contrib.pydantic import pydantic_model_creator
 from src.models.tortoise import Team as ITeam
 
 TeamPydanticWithoutToken = pydantic_model_creator(ITeam, exclude=("token",))
+TeamPydantic = pydantic_model_creator(ITeam)
 
 class Team(BaseModel):
     id: int

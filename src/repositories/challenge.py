@@ -14,3 +14,7 @@ class ChallengeRepository(Repository):
         # 假設 Challenge 模型的外鍵欄位名稱為 round，
         # 可依需求改成 filter(round_id=current_round.id)
         return await self.model.filter(pk=pk, round=current_round).first()
+
+    async def get_round_by_challenge_id(self, pk: int):
+        challenge = await self.model.get(id=pk).prefetch_related("round")
+        return challenge.round.id

@@ -19,7 +19,7 @@ async def get() -> list[Team]:
     return await repository.find_all()
 
 
-@router.get("/{token}",
+@router.get("/{token}/",
             description="Get Team by Tokens",
             response_model=Optional[Team],
             response_description="Your Team")
@@ -30,7 +30,7 @@ async def get_team_by_token(token: str):
     return team
 
 
-@router.post("/auth", response_model=TeamAuthResponse)
+@router.post("/auth/token/", response_model=TeamAuthResponse)
 async def auth_team(request: TeamAuthRequest):
     team = await ITeam.filter(token=request.token).first()
     status = False
@@ -38,6 +38,7 @@ async def auth_team(request: TeamAuthRequest):
 
     if team:
         token = jwt.create_access_token(team)
+        status=True
     return TeamAuthResponse(
         status=status,
         team=team,

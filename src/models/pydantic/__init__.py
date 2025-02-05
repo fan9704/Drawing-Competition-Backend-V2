@@ -1,11 +1,8 @@
 """
 Pydantic models.
 """
-from pydantic import BaseModel
-from src.models.pydantic.team import Team, TeamAuthRequest,TeamAuthResponse
-from src.models.pydantic.round import Round,RoundChallengeResponse
-from src.models.pydantic.clip import ClipValidationRequest,ClipValidationResponse
-
-class Item(BaseModel):
-    id: int
-    name: str
+from src.models.pydantic.team import *
+from src.models.pydantic.round import *
+from src.models.pydantic.clip import *
+from src.models.pydantic.submission import *
+from src.models.pydantic.challenge import *

@@ -1,12 +1,11 @@
-from typing import List, Optional
+from typing import List
 
-from fastapi import APIRouter, Depends, Query, HTTPException
-from sympy.plotting.textplot import is_valid
+from fastapi import APIRouter, Depends, HTTPException
 
 from src.models.pydantic.challenge import Challenge, ChallengeTeamSubmissionResponse, ChallengePydantic
-from src.repositories import ChallengeRepository, SubmissionRepository
 from src.models.tortoise import Challenge as IChallenge
 from src.models.tortoise import Submission as ISubmission
+from src.repositories import ChallengeRepository, SubmissionRepository
 
 router = APIRouter()
 
@@ -17,13 +16,13 @@ def get_challenge_repository() -> ChallengeRepository:
 def get_submission_repository() -> SubmissionRepository:
     return SubmissionRepository(ISubmission)
 
-# 1️⃣ 取得所有挑戰
+# 取得所有挑戰
 @router.get("/", response_model=List[Challenge])
 async def get_all_challenges(repository: ChallengeRepository = Depends(get_challenge_repository)):
     challenges = await repository.find_all()
     return await ChallengePydantic.from_queryset(challenges)
 
-# 2️⃣ 取得單一挑戰 (根據 ID)
+# 取得單一挑戰 (根據 ID)
 @router.get("/{pk}", response_model=Challenge)
 async def get_challenge_by_id(
     pk: int,
@@ -34,7 +33,7 @@ async def get_challenge_by_id(
         return challenge
     raise HTTPException(status_code=400, detail="Challenge is not valid")
 
-# 3️⃣ 根據 team_id 列出挑戰
+# 根據 team_id 列出挑戰
 # TODO: Change Frontend Route
 @router.get("/team/{team_id}", response_model=List[ChallengeTeamSubmissionResponse])
 async def list_challenges_by_team(

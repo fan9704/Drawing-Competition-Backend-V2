@@ -1,11 +1,11 @@
-import datetime
 from inspect import getmembers
 
 from fastapi import FastAPI
 from tortoise.contrib.starlette import register_tortoise
-from tortoise.timezone import localtime
+from fastapi.staticfiles import StaticFiles
 from src.configs import tortoise_config
 from src.utils.api.router import TypedAPIRouter
+from fastapi.middleware.cors import CORSMiddleware
 
 
 def init(app: FastAPI):
@@ -17,6 +17,24 @@ def init(app: FastAPI):
     init_db(app)
     init_exceptions_handlers(app)
     # init_router(app)
+    init_cors(app)
+    # 設定靜態文件的目錄（上傳檔案的存放位置）
+    app.mount("/media", StaticFiles(directory="media"), name="media")
+
+
+def init_cors(app: FastAPI):
+    origins = [
+        "http://localhost",
+        "http://localhost:8000",
+        "*"
+    ]
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
 
 def init_exceptions_handlers(app: FastAPI):
@@ -53,8 +71,7 @@ def init_db(app: FastAPI):
     )
 
 def init_router(app:FastAPI):
-    from src.routers import items,team
-    app.include_router(items.router)
+    from src.routers import team
     app.include_router(team.router)
 def init_routers(app: FastAPI):
     """

@@ -1,3 +1,5 @@
+from src.models.pydantic import ChallengePydantic
+from src.models.tortoise import Submission
 from src.repositories.base import Repository
 from src.models.tortoise.team import Team
 from src.models.tortoise.challenge import Challenge
@@ -10,7 +12,7 @@ class SubmissionRepository(Repository):
         return await self.model.all().order_by("-id").first()
 
     # 取得該 Team 最新一筆 Submission（以 time 欄位排序取第一筆）
-    async def find_newest_submission_by_team_id(self, team_id: int):
+    async def find_newest_submission_by_team_id(self, team_id: int) -> Submission | None:
         return await self.model.filter(team__id=team_id).order_by("-time").first()
 
     # 取得該 Team & Challenge 依照時間排序的所有 Submission（時間遞減）
@@ -81,3 +83,16 @@ class SubmissionRepository(Repository):
         else:
             qs = self.model.filter(team_id=team_id, round__id=round_id)
         return await qs.all()
+
+    # 建立暫時性的 Submission
+    async def create_temperate_submission(self, code:str,team_id:int,challenge_id:int):
+        challenge = await Challenge.get(id=challenge_id).prefetch_related("round")
+        submission = await self.model.create(
+            code = code,
+            status="doing",
+            team_id = team_id,
+            challenge_id = challenge_id,
+            round_id=challenge.round.id,
+        )
+        await submission.save()
+        return submission

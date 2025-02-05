@@ -28,7 +28,7 @@ class Repository:
         return await obj.delete()
 
     # 單筆查詢
-    async def get_by_id(self, pk):
+    async def get_by_id(self, pk)->models.Model:
         return await self.model.get(pk=pk)
 
     # 多筆查詢

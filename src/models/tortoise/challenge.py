@@ -22,7 +22,7 @@ class Challenge(models.Model):
     difficulty = fields.CharField(
         max_length=255, choices=DIFFICULTY_OPTIONS, default="easy", description="難度"
     )
-    round = fields.ForeignKeyField("models.Round", on_delete=fields.CASCADE, description="回合")
+    round = fields.ForeignKeyField("models.Round",related_name="challenge_list", on_delete=fields.CASCADE, description="回合")
     is_valid = fields.BooleanField(default=True, description="是否有效")
 
     def __str__(self):

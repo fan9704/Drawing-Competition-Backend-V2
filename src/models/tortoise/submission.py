@@ -21,6 +21,7 @@ class Submission(models.Model):
         ("fail", "fail"),
         ("success", "success"),
     ]
+    id = fields.IntField(pk=True)
     # 程式碼
     code = fields.TextField(default="", verbose_name="程式碼")
     # 提交狀態
