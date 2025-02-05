@@ -4,6 +4,7 @@ Pydantic models.
 from pydantic import BaseModel
 from src.models.pydantic.team import Team, TeamAuthRequest,TeamAuthResponse
 from src.models.pydantic.round import Round,RoundChallengeResponse
+from src.models.pydantic.clip import ClipValidationRequest,ClipValidationResponse
 
 class Item(BaseModel):
     id: int

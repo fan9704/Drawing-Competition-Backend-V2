@@ -27,7 +27,7 @@ class SubmissionRepository(Repository):
 
     # 取得該 Team 的所有 Submission
     async def find_all_submission_by_team_id(self, team_id: int):
-        return await self.model.filter(team__id=team_id).all()
+        return await self.model.filter(team__id=team_id)
 
     # 根據是否有 TeamId 取得所有 Submission，並依照 Challenge 和反向 time 排序
     async def find_all_submission_query_by_team_id_order_by_challenge_and_reverse_time(self, team_id: int):
@@ -38,8 +38,8 @@ class SubmissionRepository(Repository):
         return await qs.all()
 
     # 過濾傳入的 submissions，根據 Challenge 取得最新一筆 Submission
-    async def filter_submission_by_challenge(self, submissions, challenge: Challenge):
-        return await submissions.filter(challenge=challenge).first()
+    async def filter_submission_by_challenge(self, team_id:int, challenge: Challenge):
+        return await self.model.filter(team__id=team_id,challenge=challenge).first()
 
     # 根據 TeamId 取得所有 Submission 的查詢結果
     async def find_all_submission_query_by_team_id(self, team_id: int):

@@ -7,7 +7,7 @@ class Round(BaseModel):
     is_valid:bool
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class RoundChallengeResponse(BaseModel):
     id: int
