@@ -10,6 +10,7 @@ from src.models.pydantic.team import TeamPydantic
 from src.models.pydantic.challenge import ChallengePydantic
 
 SubmissionPydantic = pydantic_model_creator(ISubmission, name="Submission")
+SubmissionOneLayerPydantic = pydantic_model_creator(ISubmission, exclude=("team", "challenge", "round") ,name="Submission")
 
 class Submission(BaseModel):
     id: int
@@ -35,7 +36,23 @@ class Submission(BaseModel):
         return v
 
     class Config:
-        orm_mode = True  # 允許從 ORM 對象進行轉換
+        from_attributes = True  # 允許從 ORM 對象進行轉換
+
+class SubmissionOneLayer(BaseModel):
+    id: int
+    code: Optional[str] = ""
+    status: Optional[str] = "todo"
+    score: conint(ge=0, le=100) = 0  # 限制分數在 0 到 100 之間
+    fitness: conint(ge=0, le=100) = 0  # 限制吻合度在 0 到 100 之間
+    word_count: int = 0
+    execute_time: Optional[timedelta] = None
+    stdout: Optional[str] = ""
+    stderr: Optional[str]= ""
+    team: int
+    time: datetime = datetime.now()
+    challenge: int
+    round: int
+    draw_image_url: Optional[str] = ""
 
 class SubmissionStoreJudgeRequest(BaseModel):
     score: Optional[int] = None
@@ -52,7 +69,7 @@ class SubmissionSubmitCodeRequest(BaseModel):
     challenge: int
 
     class Config:
-        orm_mode = True  # 支援 ORM 映射
+        from_attributes = True   # 支援 ORM 映射
 
 class SubmissionSubmitCodeResponse(BaseModel):
     challenge:int

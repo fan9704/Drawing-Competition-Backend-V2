@@ -47,7 +47,7 @@ class Submission(models.Model):
     team = fields.ForeignKeyField("models.Team", on_delete=fields.CASCADE, verbose_name="隊伍")
     time = fields.DatetimeField(default=timezone.now, verbose_name="時間")
     challenge = fields.ForeignKeyField(
-        "models.Challenge", on_delete=fields.CASCADE, verbose_name="挑戰"
+        "models.Challenge",related_name="submission", on_delete=fields.CASCADE, verbose_name="挑戰"
     )
     round = fields.ForeignKeyField("models.Round", on_delete=fields.CASCADE, verbose_name="回合")
     draw_image_url = fields.TextField(default="", verbose_name="繪圖圖片連結")

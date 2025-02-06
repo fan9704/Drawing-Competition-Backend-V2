@@ -68,9 +68,9 @@ async def submit_code(request: SubmissionSubmitCodeRequest):
     image_url = challenge.image_url
     drawing_template_path = DRAWING_TEMPLATE_PATH
     main_drawing_path = MAIN_DRAWING_PATH
-    template_revise_path = f"media/code/{challenge_id}/team-{team_id}/drawing-{submission_id}.py"
-    code_path = f"media/code/{challenge_id}/team-{team_id}/submission-{submission_id}.py"
-    result_path = f"media/result/{challenge_id}/team-{team_id}/{submission_id}.png"
+    template_revise_path = f"media/code/{challenge_id}/team_{team_id}/drawing_{submission_id}.py"
+    code_path = f"media/code/{challenge_id}/team_{team_id}/submission_{submission_id}.py"
+    result_path = f"media/result/{challenge_id}/team_{team_id}/{submission_id}.png"
 
     # 確保資料夾位址可用
     os.makedirs(os.path.dirname(code_path), exist_ok=True) # 建立程式碼放置路徑

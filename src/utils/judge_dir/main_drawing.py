@@ -10,7 +10,7 @@ import requests
 from PIL import Image
 from sentence_transformers import util
 
-API_ENDPOINT = os.environ.get("API_ENDPOINT","https://camp.mtkuo.space:2024/api")
+API_ENDPOINT = os.environ.get("API_ENDPOINT","http://127.0.0.1:8000/api")
 
 def piecewise_function(x:float, k:float=0.24)->float:
     # Apply the sigmoid function for x > 80

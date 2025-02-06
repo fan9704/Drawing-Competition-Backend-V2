@@ -1,9 +1,11 @@
+from typing import List
+
 from tortoise import models
 
 
 class Repository:
     # 初始化 給定 ORM 操作目標
-    def __init__(self, model: models.Model):
+    def __init__(self, model:models.Model):
         self.model = model
 
     # 建立物件
@@ -36,5 +38,5 @@ class Repository:
         return await self.model.all()
 
     # 過濾
-    async def filter(self):
-        return await self.model.filter()
+    async def filter(self,**params)->List[models.Model]:
+        return await self.model.filter(**params)

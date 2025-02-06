@@ -2,7 +2,7 @@ import subprocess
 import os
 import requests
 
-API_ENDPOINT = os.environ.get("API_ENDPOINT","https://camp.mtkuo.space:2024/api")
+API_ENDPOINT = os.environ.get("API_ENDPOINT","http://127.0.0.1:8000/api")
 
 # 修改 Template
 def copy_and_modify_template(judge_template_path, template_revise_path, code_path):
