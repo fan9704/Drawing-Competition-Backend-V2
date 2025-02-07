@@ -23,6 +23,13 @@ poetry shell
 ALTER DATABASE your_database SET TIMEZONE TO 'Asia/Taipei';
 ```
 
+### Install in Server Global Environment
+
+```shell
+# GhostScript
+pip install requests psutil opencv-python sentence-transformers pillow
+```
+
 ### Run Server
 
 ```shell

@@ -1,3 +1,4 @@
+from datetime import timedelta
 from typing import List, Optional, Any
 
 from pydantic import BaseModel
@@ -39,5 +40,5 @@ class StatisticTop3TeamChallengeScoreResponseDTO(BaseModel):
     team_name: str
     max_score: int
     fitness: Optional[float]
-    execute_time: Optional[float]
+    execute_time: Optional[timedelta]
     word_count: Optional[int]

@@ -21,7 +21,9 @@ challengeRepository: ChallengeRepository = ChallengeRepository(IChallenge)
 
 
 # Store API - 更新 Submission
-@router.post("/store/{pk}", response_model=Submission)
+@router.post("/store/{pk}/"
+    # , response_model=Submission
+)
 async def store_submission(pk: int, data: SubmissionStoreJudgeRequest):
     submission = await repository.get_by_id(pk)
     submission.score = data.score
@@ -31,7 +33,7 @@ async def store_submission(pk: int, data: SubmissionStoreJudgeRequest):
     submission.stdout = data.stdout
     submission.stderr = data.stderr
     submission.status = data.status
-    submission.draw_image_url = f"/media/result/{pk}.png"
+    submission.draw_image_url = f"/media/result/{submission.challenge_id}/team_{submission.team_id}/{pk}.png"
     await repository.save(submission)
     return submission
 

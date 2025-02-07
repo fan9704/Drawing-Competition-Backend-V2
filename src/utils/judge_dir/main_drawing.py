@@ -3,6 +3,7 @@ import shutil
 import subprocess
 import sys
 import time
+import platform
 
 import cv2
 import numpy as np
@@ -149,18 +150,35 @@ def judge_logic(image_url:str, result_path:str, word_count:int, execution_time:f
 if __name__ == "__main__":
     start_time = time.time()
     # ps_file = sys.argv[1]  # Accept output path as a command-line argument
-    submission_id = sys.argv[1]
-    code_path = sys.argv[2]
-    drawing_path = sys.argv[3]
-    result_path = sys.argv[4]
-    image_url = sys.argv[5]
-    ps_src = sys.argv[6]
-    ps_dest = sys.argv[7]
+    submission_id = sys.argv[2]
+    code_path = sys.argv[3]
+    drawing_path = sys.argv[0]
+    result_path = sys.argv[5]
+    image_url = sys.argv[6]
+    ps_src = "media/result/output.ps"
+    ps_dest = f"media/result/ps/{submission_id}.ps"
+    template_revise_path = sys.argv[4]
+    # ps_dest = sys.argv[7]
     start_time = time.time()
+
+    # 檢查作業系統
+    python_runner = "python3"
+    if platform.system() == "Windows":
+        python_runner = "python"
+    # 回傳資料
+    data = {
+            "score": 0,
+            "fitness": 0,
+            "word_count": 0,
+            "execution_time": 0,
+            "stdout": "",
+            "stderr": "",
+            "status": "fail",
+        }
     try:
-        print('##%%$$ Runing code template')
+        print('##%%$$ Running code template')
         result = subprocess.run(
-            ["python3", drawing_path],
+            [python_runner, template_revise_path],
             check=True,
             capture_output=True,
             text=True,
@@ -168,37 +186,23 @@ if __name__ == "__main__":
         )
 
     except subprocess.CalledProcessError as e:
-        error_data = {
-            "score": 0,
-            "fitness": 0,
-            "word_count": 0,
-            "execution_time": 0,
-            "stdout": "",
-            "stderr": "Process crashed with the following error message :\n\n" + str(e),
-            "status": "fail",
-        }
+        data["stderr"]= "Process crashed with the following error message :\n\n" + str(e)
+        data["status"] = "fail"
         res = requests.post(
             f"{API_ENDPOINT}/submission/store/{submission_id}/",
-            json=error_data,
+            json=data,
         )
 
         print(f"Error: {e}")
-        # print(f'OUTPUT: {result.stdout}')
-        # print(f'ERROR: {result.stderr}')
+        print(f'OUTPUT: {e.stdout}')
+        print(f'ERROR: {e.stderr}')
         exit()
     except subprocess.TimeoutExpired as e:
-        error_data = {
-            "score": 0,
-            "fitness": 0,
-            "word_count": 0,
-            "execution_time": 0,
-            "stdout": "",
-            "stderr": "Time Limit Exceeded",
-            "status": "fail",
-        }
+        data["stderr"]= "Time Limit Exceeded"
+        data["status"] = "fail"
         res = requests.post(
             f"{API_ENDPOINT}/submission/store/{submission_id}/",
-            json=error_data,
+            json=data,
         )
 
         print(f"Error: {e}")
@@ -220,17 +224,14 @@ if __name__ == "__main__":
 
     execution_time = end_time - start_time
     shutil.copy(ps_src, ps_dest)
+    data["stdout"] = stdout
+    data["stderr"] = stderr
+    data["status"] = "success"
+    data["word_count"] = int(word_count)
+    data["execution_time"] = int(execution_time)
     # check if the PostScript file was created
     if not os.path.exists(ps_dest):
-        post_data = {
-            "score": 0,
-            "fitness": 0,
-            "word_count": word_count,
-            "execution_time": execution_time,
-            "stdout": stdout,
-            "stderr": stderr,
-            "status": "success",
-        }
+        pass
     else:
         convert_ps_to_png(ps_dest, result_path)
         score, similarity_score = judge_logic(
@@ -238,16 +239,9 @@ if __name__ == "__main__":
         )
         # similarity_score = (similarity_score * 4) / 3
         print(f"Weighted similarity score: {similarity_score}")
-        post_data = {
-            "score": score,
-            "fitness": similarity_score,
-            "word_count": word_count,
-            "execution_time": execution_time,
-            "stdout": stdout,
-            "stderr": stderr,
-            "status": "success",
-        }
+        data["score"] = int(score)
+        data["fitness"] = int(similarity_score)
     res = requests.post(
-        f"{API_ENDPOINT}i/submission/store/{submission_id}/",
-        json=post_data,
+        f"{API_ENDPOINT}/submission/store/{submission_id}/",
+        json=data,
     )

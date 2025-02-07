@@ -1,6 +1,7 @@
 import subprocess
 import os
 import requests
+import platform
 
 API_ENDPOINT = os.environ.get("API_ENDPOINT","http://127.0.0.1:8000/api")
 
@@ -37,16 +38,22 @@ def run_code(
 ):
 
     result_dir = os.path.dirname(result_path)
-    ps_file = f"{result_dir}/{submission_id}.ps"
+    ps_file =  f"media/result/ps/{submission_id}.ps"
     if os.path.isfile(ps_file):
         # Remove the file
         os.remove(ps_file)
     # png_file = f"{result_dir}/{output_filename}.png"
     # Ensure the result directory exists
     os.makedirs(result_dir, exist_ok=True)
+    os.makedirs("media/result/ps", exist_ok=True)
 
     copy_and_modify_template(drawing_template_path, template_revise_path, code_path)
     print(f"template revise path: {template_revise_path}")
+    # 檢查作業系統
+    python_runner = "python3"
+    if platform.system() == "Windows":
+        python_runner = "python"
+
     # Run the provided Python script to generate the PostScript file
     # Use check to raise an exception if the script fails
     try:
@@ -63,7 +70,7 @@ def run_code(
         )
         p = subprocess.Popen(
             [
-                "python3",
+                python_runner,
                 str(main_drawing_path),
                 str(ps_file),
                 str(submission_id),

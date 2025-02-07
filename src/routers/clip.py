@@ -10,6 +10,6 @@ router = APIRouter()
              description="Validation Image",
              response_model=ClipValidationResponse)
 async def clip(request:ClipValidationRequest):
-    clip_instance = Clip().get_instance()
-    similarity = clip_instance.calculate_similarity(request.image1_path,request.image2_path)
+    clip_instance = Clip.get_instance()
+    similarity = clip_instance.calculate_clip_similarity(request.image1_path,request.image2_path)
     return ClipValidationResponse(similarity=similarity)
