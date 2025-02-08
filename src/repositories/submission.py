@@ -165,6 +165,27 @@ class SubmissionRepository(Repository):
             )
         return qs
 
+    # 取得該 Team Id 該 Challenge ID 所有的 status=success 的提交紀錄
+    async def find_all_success_submission_by_challenge_id_and_team_id(self,challenge_id:int,team_id:int):
+        return await self.model.filter(challenge_id=challenge_id, team_id=team_id,status="success").values()
+
+    # 取得該 Challenge Id 所有 Team 所有 status=success 的提交紀錄
+    async def find_all_team_success_submission_challenge_id(self,challenge_id:int):
+        return await self.model.filter(challenge_id=challenge_id, status="success").order_by("team_id").values()
+
+    # 列出各題目精選圖片
+    async def find_all_challenge_featured_submission(self):
+        qs = []
+        for challenge in await challenge_repository.find_all():
+            submissions = await self.model.filter(challenge=challenge,status="success",score__gt=90).order_by("-score")
+            qs.append(
+                {
+                    "challenge": challenge,
+                    "submission": submissions,
+                }
+            )
+        return qs
+
     # 根據 TeamId 取得所有 Submission 的查詢結果
     async def find_all_submission_query_by_team_id(self, team_id: int):
         if team_id is None:

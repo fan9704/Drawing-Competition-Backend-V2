@@ -57,3 +57,18 @@ async def get_all_team_single_round_total_score(round_id: int = Path(...)):
 async def get_top3_team_challenge_score(challenge_id: int = Path(...)):
     top3_team_challenge_score = await repository.get_top3_challenge_score_by_team_id(challenge_id)
     return top3_team_challenge_score
+
+@router.get("/challenge/{challenge_id}/team/{team_id}/success/")
+async def get_all_success_submission_by_challenge_id_and_team_id(team_id: int, challenge_id: int):
+    all_success_submission = await repository.find_all_success_submission_by_challenge_id_and_team_id(team_id, challenge_id)
+    return all_success_submission
+
+@router.get("/challenge/{challenge_id}/allTeam/success/")
+async def get_all_team_success_submission_challenge_id(challenge_id: int):
+    all_team_success_submission = await repository.find_all_team_success_submission_challenge_id(challenge_id)
+    return all_team_success_submission
+
+@router.get("/challenge/all/featured/allTeam/success/")
+async def get_all_challenge_featured_submission():
+    all_challenge_featured_submission = await repository.find_all_challenge_featured_submission()
+    return all_challenge_featured_submission
