@@ -1,22 +1,18 @@
 from typing import List, Optional
 
-from fastapi import APIRouter, Query, Path, HTTPException, Depends
+from fastapi import APIRouter, Query, Path, Depends
 
 from src.models.pydantic.statistic import StatisticTeamChallengeScoreResponseDTO, \
     StatisticTeamChallengeSubmissionCountResponseDTO, StatisticTeamRoundTotalScoreResponseDTO, \
     StatisticAllTeamSingleRoundTotalScoreResponseDTO, StatisticTop3TeamChallengeScoreResponseDTO, \
     StatisticAllTeamRoundTotalScoreResponseDTO
-from src.models.tortoise import Challenge as IChallenge
-from src.models.tortoise import Round as IRound
-from src.models.tortoise import Submission as ISubmission
-from src.models.tortoise import Team as ITeam
-from src.repositories import SubmissionRepository, ChallengeRepository, TeamRepository, RoundRepository
+from src.repositories import SubmissionRepository
 
 router = APIRouter()
 
 # Repository 依賴
 def get_submission_repository() -> SubmissionRepository:
-    return SubmissionRepository(ISubmission)
+    return SubmissionRepository()
 
 @router.get("/team/",
             response_model=List[StatisticTeamChallengeScoreResponseDTO]

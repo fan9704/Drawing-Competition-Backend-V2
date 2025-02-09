@@ -3,19 +3,17 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 
 from src.models.pydantic import ChallengeWithOutRelationPydantic
-from src.models.pydantic.challenge import Challenge, ChallengeTeamSubmissionResponse, ChallengePydantic
-from src.models.tortoise import Challenge as IChallenge
-from src.models.tortoise import Submission as ISubmission
+from src.models.pydantic.challenge import Challenge, ChallengeTeamSubmissionResponse
 from src.repositories import ChallengeRepository, SubmissionRepository
 
 router = APIRouter()
 
 # Repository 依賴
 def get_challenge_repository() -> ChallengeRepository:
-    return ChallengeRepository(IChallenge)
+    return ChallengeRepository()
 
 def get_submission_repository() -> SubmissionRepository:
-    return SubmissionRepository(ISubmission)
+    return SubmissionRepository()
 
 # 取得所有挑戰
 @router.get("/",

@@ -5,10 +5,9 @@ from typing import List
 from fastapi import APIRouter, HTTPException, Depends
 
 from src.configs.cfg import DRAWING_TEMPLATE_PATH, MAIN_DRAWING_PATH
-from src.models.pydantic import SubmissionStoreJudgeRequest, Submission
+from src.models.pydantic import SubmissionStoreJudgeRequest
 from src.models.pydantic.submission import SubmissionSubmitCodeRequest, SubmissionSubmitCodeResponse, \
     SubmissionTeamRecordResponse, SubmissionOneLayerPydantic
-from src.models.tortoise import Challenge as IChallenge
 from src.models.tortoise import Submission as ISubmission
 from src.repositories import ChallengeRepository
 from src.repositories import SubmissionRepository
@@ -18,10 +17,10 @@ router = APIRouter()
 
 # Repository 依賴
 def get_challenge_repository() -> ChallengeRepository:
-    return ChallengeRepository(IChallenge)
+    return ChallengeRepository()
 
 def get_submission_repository() -> SubmissionRepository:
-    return SubmissionRepository(ISubmission)
+    return SubmissionRepository()
 
 
 # Store API - 更新 Submission

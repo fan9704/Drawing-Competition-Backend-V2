@@ -3,11 +3,10 @@ from typing import Optional
 from fastapi import APIRouter, Response
 
 from src.models.pydantic import Round, RoundChallengeResponse, ChallengePydantic
-from src.models.tortoise import Round as IRound
 from src.repositories import RoundRepository
 
 router = APIRouter()
-repository: RoundRepository = RoundRepository(IRound)
+repository: RoundRepository = RoundRepository()
 
 # RoundListAPIView (列出所有回合)
 @router.get("/",

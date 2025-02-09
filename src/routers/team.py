@@ -3,13 +3,12 @@ from typing import Optional, List
 from fastapi import APIRouter, HTTPException, Depends
 
 from src.models.pydantic import Team, TeamAuthRequest, TeamAuthResponse
-from src.models.tortoise import Team as ITeam
 from src.repositories import TeamRepository
 from src.utils import jwt
 
 router = APIRouter()
 def get_team_repository() -> TeamRepository:
-    return TeamRepository(ITeam)
+    return TeamRepository()
 
 
 @router.get("/",
