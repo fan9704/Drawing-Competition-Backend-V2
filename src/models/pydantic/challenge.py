@@ -3,6 +3,7 @@ from tortoise.contrib.pydantic import pydantic_model_creator
 from src.models.tortoise import Challenge as IChallenge
 
 ChallengePydantic = pydantic_model_creator(IChallenge, name="Challenge")
+ChallengeWithOutRelationPydantic = pydantic_model_creator(IChallenge, exclude=("team", "challenge"), name="ChallengeWithoutRelation")
 
 class Challenge(BaseModel):
     id:int

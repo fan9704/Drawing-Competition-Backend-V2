@@ -1,8 +1,10 @@
 from src.repositories.base import Repository
-
-
+from src.models.tortoise import Round as IRound
 from datetime import datetime
+
 class RoundRepository(Repository):
+    def __init__(self):
+        self.model = IRound
     # 取得當前 Round
     async def get_current_round(self):
         return await self.model.filter(

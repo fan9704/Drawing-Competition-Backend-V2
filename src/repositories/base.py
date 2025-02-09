@@ -1,12 +1,15 @@
-from typing import List
-
+from typing import List,Type, TypeVar
+from abc import ABC, abstractmethod
 from tortoise import models
 
+T = TypeVar("T", bound=models.Model)
 
-class Repository:
+class Repository(ABC):
+    model: Type[T]
     # 初始化 給定 ORM 操作目標
-    def __init__(self, model:models.Model):
-        self.model = model
+    @abstractmethod
+    def __init__(self, model:models.Model) -> None:
+        pass
 
     # 建立物件
     async def create(self, **data):

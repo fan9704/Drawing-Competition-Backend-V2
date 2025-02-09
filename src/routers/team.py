@@ -1,6 +1,6 @@
 from typing import Optional, List
 
-from fastapi import APIRouter, Response
+from fastapi import APIRouter, HTTPException, Depends
 
 from src.models.pydantic import Team, TeamAuthRequest, TeamAuthResponse
 from src.models.tortoise import Team as ITeam
@@ -8,14 +8,15 @@ from src.repositories import TeamRepository
 from src.utils import jwt
 
 router = APIRouter()
-repository: TeamRepository = TeamRepository(ITeam)
+def get_team_repository() -> TeamRepository:
+    return TeamRepository(ITeam)
 
 
 @router.get("/",
             description="Get All Teams",
             response_model=List[Team],
             response_description="All Teams")
-async def get() -> list[Team]:
+async def get(repository:TeamRepository = Depends(get_team_repository)) -> List[Team]:
     return await repository.find_all()
 
 
@@ -23,16 +24,19 @@ async def get() -> list[Team]:
             description="Get Team by Tokens",
             response_model=Optional[Team],
             response_description="Your Team")
-async def get_team_by_token(token: str):
-    team = await ITeam.filter(token=token).first()
+async def get_team_by_token(token: str,repository:TeamRepository = Depends(get_team_repository)) -> Optional[Team]:
+    team = await repository.get_team_by_token(token=token)
     if not team:
-        return Response(status_code=400, content="Token is invalid")
+        raise HTTPException(status_code=400, detail="Token is invalid")
     return team
 
 
-@router.post("/auth/token/", response_model=TeamAuthResponse)
-async def auth_team(request: TeamAuthRequest):
-    team = await ITeam.filter(token=request.token).first()
+@router.post("/auth/token/",
+             description="Team Auth with Token API",
+             response_model=TeamAuthResponse,
+             response_description="Your Team Information")
+async def auth_team(request: TeamAuthRequest,repository:TeamRepository = Depends(get_team_repository))->TeamAuthResponse:
+    team = await repository.get_team_by_token(token=request.token)
     status = False
     token = None
 

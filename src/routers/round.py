@@ -11,8 +11,8 @@ repository: RoundRepository = RoundRepository(IRound)
 
 # RoundListAPIView (列出所有回合)
 @router.get("/",
-            # response_model=Optional[RoundChallengeResponse]
-            )
+            response_model=Optional[RoundChallengeResponse]
+)
 async def get_all_rounds():
     round_instance = await repository.get_current_round()
     if round_instance:

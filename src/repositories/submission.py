@@ -1,3 +1,5 @@
+from typing import List
+
 from tortoise.functions import Max
 
 from src.models.pydantic import SubmissionOneLayerPydantic
@@ -8,15 +10,19 @@ from src.models.pydantic.statistic import StatisticTeamChallengeScoreResponseDTO
 from src.models.tortoise import Submission
 from src.models.tortoise.challenge import Challenge as IChallenge
 from src.models.tortoise.round import Round as IRound
+from src.models.tortoise.submission import Submission as ISubmission
 from src.models.tortoise.team import Team as ITeam
-from src.repositories.challenge import ChallengeRepository
 from src.repositories.base import Repository
+from src.repositories.challenge import ChallengeRepository
 from src.repositories.team import TeamRepository
 
-challenge_repository:ChallengeRepository = ChallengeRepository(IChallenge)
-team_repository:TeamRepository = TeamRepository(ITeam)
+challenge_repository:ChallengeRepository = ChallengeRepository()
+team_repository:TeamRepository = TeamRepository()
 
 class SubmissionRepository(Repository):
+    def __init__(self):
+        self.model = ISubmission
+
     # 取得最新一筆 Submission（依據 id 遞增假設最新者 id 最大）
     async def get_last_submission(self):
         return await self.model.all().order_by("-id").first()
@@ -62,17 +68,23 @@ class SubmissionRepository(Repository):
                 challenge=challenge
             ).order_by("-score").first()
             max_score = await self.model.filter(team__id=team_id,challenge=challenge).order_by("-score").first().values()
+            if max_score is None:
+                max_score = 0
+                continue
+            else:
+                max_score = max_score["score"]
+            submission = await SubmissionOneLayerPydantic.from_tortoise_orm(max_score_submission)
             res = StatisticTeamChallengeScoreResponseDTO(
                 challenge=challenge.id,
                 team_id=team_id,
-                max_score=max_score["score"],
-                submission=await SubmissionOneLayerPydantic.from_tortoise_orm(max_score_submission),
+                max_score=max_score,
+                submission=submission,
             )
             qs.append(res)
         return qs
 
     # 計算該 Team Id 提交每個挑戰次數
-    async def count_team_all_count_submission(self,team_id:int):
+    async def count_team_all_count_submission(self,team_id:int) -> List[StatisticTeamChallengeSubmissionCountResponseDTO]:
         qs = []
         for challenge in await challenge_repository.find_all():
             submission_count = await self.model.filter(team__id=team_id,challenge=challenge).count()
@@ -81,14 +93,17 @@ class SubmissionRepository(Repository):
                 submission_count=submission_count,
             )
             qs.append(res)
-        return  qs
+        return qs
 
     # 計算該 Team Id 該 Round Id 獲得總分
     async def get_team_round_total_score(self,team_id:int,round_id:int):
         total_score = 0
         for challenge in await challenge_repository.filter(round__id=round_id):
             max_score = await self.model.filter(team__id=team_id,challenge=challenge).order_by("-score").first().values()
-            total_score += max_score["score"]
+            if max_score is None:
+                break
+            else:
+                total_score += max_score["score"]
         return StatisticTeamRoundTotalScoreResponseDTO(
             round_id=round_id,
             team_id=team_id,
