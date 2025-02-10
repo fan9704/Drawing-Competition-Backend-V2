@@ -18,3 +18,21 @@ services:
       - "postgres:pgadmin"
     volumes:
      - "./pgadmin_data:/var/lib/pgadmin"
+  redis:
+    image: redis:alpine
+    container_name: redis
+    ports:
+      - "0.0.0.0:6379:6379"
+    volumes:
+      - ./redis_data:/data
+  redis-insight:
+    image: redis/redisinsight
+    container_name: redis_insight
+    ports:
+      - "0.0.0.0:5540:5540"
+    links:
+      - "redis:redis-insight"
+    volumes:
+      - ./redis_insight_data:/data
+    depends_on:
+      - redis

@@ -3,6 +3,8 @@
 .venv
 postgres-data
 pgadmin_data
+redis_data
+redis_insight_data
 
 ### IDEA
 .idea
