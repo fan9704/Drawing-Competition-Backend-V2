@@ -16,3 +16,5 @@ opencv-python~=4.11.0.86
 numpy~=2.2.2
 psutil~=6.1.1
 ngrok~=1.4.0
+uvicorn~=0.34.0
+redis~=5.2.1

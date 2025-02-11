@@ -1,18 +1,20 @@
 import datetime
 import os
 from typing import List
-
+from redis import Redis
 from fastapi import APIRouter, HTTPException, Depends
+from src.initializer import init_redis_pool
 
 from src.configs.cfg import DRAWING_TEMPLATE_PATH, MAIN_DRAWING_PATH
 from src.models.pydantic import SubmissionStoreJudgeRequest
 from src.models.pydantic.submission import SubmissionSubmitCodeRequest, SubmissionSubmitCodeResponse, \
     SubmissionTeamRecordResponse, SubmissionOneLayerPydantic
 from src.models.tortoise import Submission as ISubmission
-from src.repositories import ChallengeRepository
+from src.repositories import ChallengeRepository, TeamRepository
 from src.repositories import SubmissionRepository
 from src.utils.judge import judge_submission
 
+LEADERBOARD_KEY = "leaderboard"
 router = APIRouter()
 
 # Repository 依賴
@@ -22,13 +24,17 @@ def get_challenge_repository() -> ChallengeRepository:
 def get_submission_repository() -> SubmissionRepository:
     return SubmissionRepository()
 
+def get_team_repository() -> TeamRepository:
+    return TeamRepository()
 
 # Store API - 更新 Submission
 @router.post("/store/{pk}/"
     # , response_model=Submission
 )
 async def store_submission(pk: int, data: SubmissionStoreJudgeRequest,
-                           repository: SubmissionRepository= Depends(get_submission_repository),):
+                           repository: SubmissionRepository= Depends(get_submission_repository),
+                           team_repository: TeamRepository = Depends(get_team_repository),
+                           redis_client:Redis = Depends(init_redis_pool)):
     submission = await repository.get_by_id(pk)
     submission.score = data.score
     submission.fitness = data.fitness
@@ -37,8 +43,20 @@ async def store_submission(pk: int, data: SubmissionStoreJudgeRequest,
     submission.stdout = data.stdout
     submission.stderr = data.stderr
     submission.status = data.status
-    submission.draw_image_url = f"/media/result/{submission.challenge_id}/team_{submission.team_id}/{pk}.png"
+    submission.draw_image_url = f"/media/result/{submission["challenge_id"]}/team_{submission["team_id"]}/{pk}.png"
     await repository.save(submission)
+
+    # Check is new maximum score
+    max_score_submission = await repository.find_max_score_submission_by_challenge_id_and_team_id(challenge_id=submission["challenge_id"],team_id=submission["team_id"])
+    if max_score_submission is not None or max_score_submission["score"] < submission.score:
+        team = await team_repository.get_by_id(pk=submission["team_id"])
+        redis_data = {
+            # "team_id": submission["team_id"],
+            # "team_name":team["name"],
+            # "score_list" :[]
+            # "total_score": total_score,
+        }
+        await redis_client.zadd(LEADERBOARD_KEY, redis_data)
     return submission
 
 

@@ -17,6 +17,13 @@ class PostgresSettings:
     postgres_port: str = field("POSTGRES_PORT", default="5432")
     postgres_host: str = field("POSTGRES_HOST", default="postgres")
 
+@betterconf(provider=DotenvProvider(auto_load=True))
+class RedisSettings:
+    """Redis env values"""
+    redis_host: str = field("REDIS_HOST", default="localhost")
+    redis_port: str = field("REDIS_PORT", default="6379")
+    redis_db: str = field("REDIS_DB", default="0")
+
 
 class TortoiseSettings:
     """Tortoise-ORM settings"""

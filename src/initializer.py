@@ -1,12 +1,13 @@
 from inspect import getmembers
-
+from typing import AsyncIterator
 from fastapi import FastAPI
+from redis import Redis
 from tortoise.contrib.starlette import register_tortoise
 from fastapi.staticfiles import StaticFiles
-from src.configs import tortoise_config
+from src.configs import tortoise_config,redis_config
 from src.utils.api.router import TypedAPIRouter
 from fastapi.middleware.cors import CORSMiddleware
-
+import redis.asyncio as redis
 
 def init(app: FastAPI):
     """
@@ -16,8 +17,8 @@ def init(app: FastAPI):
     init_routers(app)
     init_db(app)
     init_exceptions_handlers(app)
-    # init_router(app)
     init_cors(app)
+    init_redis_pool()
     # 設定靜態文件的目錄（上傳檔案的存放位置）
     app.mount("/media", StaticFiles(directory="media"), name="media")
 
@@ -35,7 +36,9 @@ def init_cors(app: FastAPI):
         allow_methods=["*"],
         allow_headers=["*"],
     )
-
+def init_redis_pool() -> Redis:
+    pool = redis.ConnectionPool(host=redis_config.redis_host, port=redis_config.redis_port, db=redis_config.redis_db)
+    return redis.Redis(connection_pool=pool)
 
 def init_exceptions_handlers(app: FastAPI):
     from src.exceptions.handlers import tortoise_exception_handler
@@ -69,10 +72,6 @@ def init_db(app: FastAPI):
         app,
         config=config,
     )
-
-def init_router(app:FastAPI):
-    from src.routers import team
-    app.include_router(team.router)
 def init_routers(app: FastAPI):
     """
     Initialize routers defined in `app.api`
