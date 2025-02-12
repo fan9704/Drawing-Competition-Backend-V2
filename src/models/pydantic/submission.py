@@ -63,6 +63,22 @@ class SubmissionStoreJudgeRequest(BaseModel):
     stderr: Optional[str] = None
     status: Optional[str] = None
 
+class SubmissionStoreJudgeResponse(BaseModel):
+    id: int
+    team_id :int
+    score: Optional[int] = 0
+    code: Optional[str] = ""
+    fitness: Optional[int] = 0
+    word_count: Optional[int] = 0
+    execution_time: Optional[int] = 0
+    stdout: Optional[str] = ""
+    stderr: Optional[str] = ""
+    status: Optional[str] = "doing"
+    draw_image_url: Optional[str] = ""
+    time: datetime = datetime.now()
+    challenge_id:int
+    round_id:int
+
 class SubmissionSubmitCodeRequest(BaseModel):
     code: str
     team:  int

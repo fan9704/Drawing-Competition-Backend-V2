@@ -7,7 +7,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from src.configs.cfg import DRAWING_TEMPLATE_PATH, MAIN_DRAWING_PATH
 from src.models.pydantic import SubmissionStoreJudgeRequest
 from src.models.pydantic.submission import SubmissionSubmitCodeRequest, SubmissionSubmitCodeResponse, \
-    SubmissionTeamRecordResponse, SubmissionOneLayerPydantic
+    SubmissionTeamRecordResponse, SubmissionOneLayerPydantic, SubmissionStoreJudgeResponse
 from src.models.tortoise import Submission as ISubmission
 from src.repositories import ChallengeRepository
 from src.repositories import SubmissionRepository
@@ -24,8 +24,11 @@ def get_submission_repository() -> SubmissionRepository:
 
 
 # Store API - 更新 Submission
-@router.post("/store/{pk}/"
-    # , response_model=Submission
+@router.post("/store/{pk}/",
+             summary="儲存提交",
+             description="Store submission",
+             response_model=SubmissionStoreJudgeResponse,
+             response_description="Score store full submission record"
 )
 async def store_submission(pk: int, data: SubmissionStoreJudgeRequest,
                            repository: SubmissionRepository= Depends(get_submission_repository),):
@@ -44,7 +47,11 @@ async def store_submission(pk: int, data: SubmissionStoreJudgeRequest,
 
 
 # Submission API - 提交程式碼
-@router.post("/", response_model=SubmissionSubmitCodeResponse)
+@router.post("/",
+             summary="提交程式碼",
+             description="Submit code",
+             response_model=SubmissionSubmitCodeResponse,
+             response_description="Score store full submission record")
 async def submit_code(request: SubmissionSubmitCodeRequest,repository: SubmissionRepository= Depends(get_submission_repository),challenge_repository: ChallengeRepository = Depends(get_challenge_repository)):
     # 取得需要的資料
     now = datetime.datetime.now()
@@ -112,7 +119,10 @@ async def submit_code(request: SubmissionSubmitCodeRequest,repository: Submissio
 
 # Get all submissions by team and challenge
 @router.get("/all/{challenge_id}/{team_id}/",
-            response_model=List[SubmissionTeamRecordResponse]
+            summary="取得該 Team 所有提交 ",
+            description="Get all submissions by team id",
+            response_model=List[SubmissionTeamRecordResponse],
+            response_description="All submission records by team id"
             )
 async def get_submissions_by_team_and_challenge(challenge_id: int, team_id: int):
     submissions = await ISubmission.filter(challenge_id=challenge_id, team_id=team_id).order_by("-time")
@@ -122,9 +132,10 @@ async def get_submissions_by_team_and_challenge(challenge_id: int, team_id: int)
 # Get the highest score submission by team and challenge
 # TODO: Change Route
 @router.get("/max/{challenge_id}/{team_id}/",
-            summary="Get Highest Score in challenge id and team id",
-            response_description="Highest Score in that team",
-            response_model=SubmissionOneLayerPydantic
+            summary="取得該 Team 於 Challenge最高分",
+            description="Get Highest Score in challenge id and team id",
+            response_model=SubmissionOneLayerPydantic,
+            response_description="Highest Score in that team"
 )
 async def get_highest_score_submission(challenge_id: int, team_id: int,repository: SubmissionRepository = Depends(get_submission_repository)):
     submission = await repository.find_max_score_submission_by_challenge_id_and_team_id(challenge_id, team_id)
@@ -135,9 +146,11 @@ async def get_highest_score_submission(challenge_id: int, team_id: int,repositor
 
 # Get all submissions by team
 @router.get("/team/{team_id}/",
-            summary="Get team all submission",
-            response_description="Get All submission by team id",
-            response_model=List[SubmissionOneLayerPydantic])
+            summary="取得該 Team 所有提交",
+            description="Get team all submission",
+            response_model=List[SubmissionOneLayerPydantic],
+            response_description="Get All submission by team id"
+)
 async def get_all_submissions_by_team(team_id: int,repository: SubmissionRepository = Depends(get_submission_repository)):
     submissions = await repository.find_all_submission_by_team_id(team_id)
     return submissions

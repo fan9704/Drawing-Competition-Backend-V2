@@ -3,6 +3,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 
 from src.models.pydantic import ChallengeWithOutRelationPydantic
+from src.models.tortoise import Challenge as IChallenge
 from src.models.pydantic.challenge import Challenge, ChallengeTeamSubmissionResponse
 from src.repositories import ChallengeRepository, SubmissionRepository
 
@@ -17,13 +18,20 @@ def get_submission_repository() -> SubmissionRepository:
 
 # 取得所有挑戰
 @router.get("/",
-    response_model=List[ChallengeWithOutRelationPydantic]
+            summary="取得所有 Challenge",
+            description="Get All Challenge",
+            response_model=List[ChallengeWithOutRelationPydantic],
+            response_description="All Challenge"
 )
 async def get_all_challenges(repository: ChallengeRepository = Depends(get_challenge_repository)):
     return await ChallengeWithOutRelationPydantic.from_queryset(repository.find_all())
 
 # 取得單一挑戰 (根據 ID)
-@router.get("/{pk}", response_model=Challenge)
+@router.get("/{pk}",
+            summary="取得該 Challenge 透過 ID",
+            description="Get Challenge by ID",
+            response_model=Challenge,
+            response_description="Challenge")
 async def get_challenge_by_id(
     pk: int,
     repository: ChallengeRepository = Depends(get_challenge_repository)
@@ -35,7 +43,11 @@ async def get_challenge_by_id(
 
 # 根據 team_id 列出挑戰
 # TODO: Change Frontend Route
-@router.get("/team/{team_id}", response_model=List[ChallengeTeamSubmissionResponse])
+@router.get("/team/{team_id}",
+            summary="Challenge Team 提交狀態",
+            description="Get Challenge Submission Status Team by ID",
+            response_model=List[ChallengeTeamSubmissionResponse],
+            response_description="Team Challenge Submission Status")
 async def list_challenges_by_team(
     team_id: int = None,
     repository: ChallengeRepository = Depends(get_challenge_repository),
@@ -44,7 +56,7 @@ async def list_challenges_by_team(
     if team_id is None:
         raise HTTPException(status_code=400, detail="team_id is required")
 
-    challenges = await repository.filter()
+    challenges:List[IChallenge] = await repository.filter()
     challenge_status_list = []
     for challenge in challenges:
         challenge_status =  await submission_repository.filter_submission_by_challenge(team_id, challenge)
