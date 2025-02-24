@@ -1,113 +1,114 @@
-from pydantic import BaseModel, validator, conint
+from pydantic import BaseModel, conint, Field
 from typing import Optional
 from datetime import datetime, timedelta
 
 from tortoise.contrib.pydantic import pydantic_model_creator
-
+from src.models.enums import StatusEnum
 from src.models.tortoise.submission import Submission as ISubmission
 from src.models.pydantic import RoundPydantic
 from src.models.pydantic.team import TeamPydantic
 from src.models.pydantic.challenge import ChallengePydantic
 
 SubmissionPydantic = pydantic_model_creator(ISubmission, name="Submission")
-SubmissionOneLayerPydantic = pydantic_model_creator(ISubmission, exclude=("team", "challenge", "round") ,name="Submission")
+SubmissionOneLayerPydantic = pydantic_model_creator(ISubmission, exclude=("team", "challenge", "round"),
+                                                    name="Submission")
+
 
 class Submission(BaseModel):
     id: int
-    code: Optional[str] = ""
-    status: Optional[str] = "todo"
+    code: str = Field(default="")
+    status: StatusEnum = Field(examples=[StatusEnum.todo])
     score: conint(ge=0, le=100) = 0  # 限制分數在 0 到 100 之間
     fitness: conint(ge=0, le=100) = 0  # 限制吻合度在 0 到 100 之間
     word_count: int = 0
     execute_time: Optional[timedelta] = None
-    stdout: Optional[str] = ""
-    stderr: Optional[str]= ""
+    stdout: str = Field(default="")
+    stderr: str = Field(default="")
     team: TeamPydantic  # 假設這是 team 的 ID (ForeignKey)
-    time: datetime = datetime.now()
+    time: datetime = Field(default=datetime.now())
     challenge: ChallengePydantic  # 假設這是 challenge 的 ID (ForeignKey)
     round: RoundPydantic  # 假設這是 round 的 ID (ForeignKey)
-    draw_image_url: Optional[str] = ""
-
-    @validator('status')
-    def validate_status(cls, v):
-        status_options = ["todo", "doing", "fail", "success"]
-        if v not in status_options:
-            raise ValueError(f"Status must be one of {status_options}")
-        return v
+    draw_image_url: Optional[str] = Field(default="/images/default.png", examples=["/images/default.png"])
 
     class Config:
         from_attributes = True  # 允許從 ORM 對象進行轉換
 
+
 class SubmissionOneLayer(BaseModel):
     id: int
-    code: Optional[str] = ""
-    status: Optional[str] = "todo"
+    code: str = Field(default="")
+    status: StatusEnum = Field(examples=[StatusEnum.todo])
     score: conint(ge=0, le=100) = 0  # 限制分數在 0 到 100 之間
     fitness: conint(ge=0, le=100) = 0  # 限制吻合度在 0 到 100 之間
     word_count: int = 0
     execute_time: Optional[timedelta] = None
-    stdout: Optional[str] = ""
-    stderr: Optional[str]= ""
+    stdout: str = Field(default="")
+    stderr: str = Field(default="")
     team: int
-    time: datetime = datetime.now()
+    time: datetime = Field(default=datetime.now())
     challenge: int
     round: int
-    draw_image_url: Optional[str] = ""
+    draw_image_url: Optional[str] = Field(default="/images/default.png", examples=["/images/default.png"])
+
 
 class SubmissionStoreJudgeRequest(BaseModel):
-    score: Optional[int] = None
-    fitness: Optional[int] = None
-    word_count: Optional[int] = None
-    execution_time: Optional[int] = None
-    stdout: Optional[str] = None
-    stderr: Optional[str] = None
-    status: Optional[str] = None
+    score: Optional[int] = Field(examples=[0], gt=0)
+    fitness: Optional[int] = Field(examples=[0], gt=0)
+    word_count: Optional[int] = Field(examples=[0], gt=0)
+    execution_time: Optional[int] = Field(examples=[0], gt=0)
+    stdout: str = Field(default="")
+    stderr: str = Field(default="")
+    status: StatusEnum = Field(examples=[StatusEnum.todo])
+
 
 class SubmissionStoreJudgeResponse(BaseModel):
     id: int
-    team_id :int
-    score: Optional[int] = 0
-    code: Optional[str] = ""
-    fitness: Optional[int] = 0
-    word_count: Optional[int] = 0
-    execution_time: Optional[int] = 0
-    stdout: Optional[str] = ""
-    stderr: Optional[str] = ""
-    status: Optional[str] = "doing"
-    draw_image_url: Optional[str] = ""
-    time: datetime = datetime.now()
-    challenge_id:int
-    round_id:int
+    team_id: int
+    score: Optional[int] = Field(examples=[0], gt=0)
+    code: str = Field(default="")
+    fitness: Optional[int] = Field(examples=[0], gt=0)
+    word_count: Optional[int] = Field(examples=[0], gt=0)
+    execution_time: Optional[int] = Field(examples=[0], gt=0)
+    stdout: str = Field(default="")
+    stderr: str = Field(default="")
+    status: StatusEnum = Field(examples=[StatusEnum.todo])
+    draw_image_url: Optional[str] = Field(default="/images/default.png", examples=["/images/default.png"])
+    time: datetime = Field(default=datetime.now())
+    challenge_id: int
+    round_id: int
+
 
 class SubmissionSubmitCodeRequest(BaseModel):
-    code: str
-    team:  int
+    code: str = Field(default="")
+    team: int
     challenge: int
 
     class Config:
-        from_attributes = True   # 支援 ORM 映射
+        from_attributes = True
+
 
 class SubmissionSubmitCodeResponse(BaseModel):
-    challenge:int
-    code: str
-    draw_image_url: Optional[str] = None
+    challenge: int
+    code: str = Field(default="")
+    draw_image_url: Optional[str] = Field(default="/images/default.png", examples=["/images/default.png"])
     round: int
-    status: str
-    team:int
-    time: datetime
+    status: StatusEnum = Field(examples=[StatusEnum.todo])
+    team: int
+    time: datetime = Field(default=datetime.now())
+
 
 class SubmissionTeamRecordResponse(BaseModel):
-    team_id:int
-    stderr: Optional[str] = ""
-    challenge_id:int
+    team_id: int
+    stderr: str = Field(default="")
+    challenge_id: int
     round_id: int
-    status: str
-    code: str
-    execute_time: Optional[timedelta] = None
+    status: StatusEnum = Field(examples=[StatusEnum.todo])
+    code: str = Field(default="")
+    execute_time: Optional[timedelta] = Field(examples=[0], gt=0)
     score: Optional[conint(ge=0, le=100)] = 0
-    stdout: Optional[str] = ""
-    draw_image_url: Optional[str] = None
+    stdout: str = Field(default="")
+    draw_image_url: Optional[str] = Field(default="/images/default.png", examples=["/images/default.png"])
     id: int
-    fitness: Optional[float] = 0
-    time: datetime = datetime.now()
-    word_count:int =0
+    fitness: int = Field(examples=[0], gt=0)
+    time: datetime = Field(default=datetime.now())
+    word_count: int = Field(examples=[0], gt=0)
