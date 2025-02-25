@@ -15,19 +15,19 @@ SubmissionOneLayerPydantic = pydantic_model_creator(ISubmission, exclude=("team"
 
 
 class Submission(BaseModel):
-    id: int
+    id: int = Field()
     code: str = Field(default="")
     status: StatusEnum = Field(examples=[StatusEnum.todo])
-    score: conint(ge=0, le=100) = 0  # 限制分數在 0 到 100 之間
-    fitness: conint(ge=0, le=100) = 0  # 限制吻合度在 0 到 100 之間
-    word_count: int = 0
+    score: int = Field(default=0, examples=[0], ge=0, le=100)
+    fitness: int = Field(default=0, examples=[0], ge=0, le=100)
+    word_count: int = Field(default=0, examples=[0], ge=0)
     execute_time: Optional[timedelta] = None
     stdout: str = Field(default="")
     stderr: str = Field(default="")
-    team: TeamPydantic  # 假設這是 team 的 ID (ForeignKey)
+    team: TeamPydantic = Field()
     time: datetime = Field(default=datetime.now())
-    challenge: ChallengePydantic  # 假設這是 challenge 的 ID (ForeignKey)
-    round: RoundPydantic  # 假設這是 round 的 ID (ForeignKey)
+    challenge: ChallengePydantic
+    round: RoundPydantic
     draw_image_url: Optional[str] = Field(default="/images/default.png", examples=["/images/default.png"])
 
     class Config:
@@ -35,80 +35,80 @@ class Submission(BaseModel):
 
 
 class SubmissionOneLayer(BaseModel):
-    id: int
+    id: int = Field()
     code: str = Field(default="")
     status: StatusEnum = Field(examples=[StatusEnum.todo])
-    score: conint(ge=0, le=100) = 0  # 限制分數在 0 到 100 之間
-    fitness: conint(ge=0, le=100) = 0  # 限制吻合度在 0 到 100 之間
-    word_count: int = 0
+    score: int = Field(default=0, examples=[0], ge=0, le=100)
+    fitness: int = Field(default=0, examples=[0], ge=0, le=100)
+    word_count: int = Field(default=0, examples=[0], ge=0)
     execute_time: Optional[timedelta] = None
     stdout: str = Field(default="")
     stderr: str = Field(default="")
-    team: int
+    team: int = Field()
     time: datetime = Field(default=datetime.now())
-    challenge: int
-    round: int
+    challenge: int = Field()
+    round: int = Field()
     draw_image_url: Optional[str] = Field(default="/images/default.png", examples=["/images/default.png"])
 
 
 class SubmissionStoreJudgeRequest(BaseModel):
-    score: Optional[int] = Field(examples=[0], gt=0)
-    fitness: Optional[int] = Field(examples=[0], gt=0)
-    word_count: Optional[int] = Field(examples=[0], gt=0)
-    execution_time: Optional[int] = Field(examples=[0], gt=0)
+    score: int = Field(default=0, examples=[0], ge=0, le=100)
+    fitness: int = Field(default=0, examples=[0], ge=0, le=100)
+    word_count: int = Field(default=0, examples=[0], ge=0)
+    execution_time: Optional[int] = Field(examples=[0], ge=0)
     stdout: str = Field(default="")
     stderr: str = Field(default="")
     status: StatusEnum = Field(examples=[StatusEnum.todo])
 
 
 class SubmissionStoreJudgeResponse(BaseModel):
-    id: int
-    team_id: int
-    score: Optional[int] = Field(examples=[0], gt=0)
+    id: int = Field()
+    team_id: int = Field()
+    score: int = Field(default=0, examples=[0], ge=0, le=100)
     code: str = Field(default="")
-    fitness: Optional[int] = Field(examples=[0], gt=0)
-    word_count: Optional[int] = Field(examples=[0], gt=0)
-    execution_time: Optional[int] = Field(examples=[0], gt=0)
+    fitness: int = Field(default=0, examples=[0], ge=0, le=100)
+    word_count: int = Field(default=0, examples=[0], ge=0)
+    execution_time: Optional[int] = Field(examples=[0], ge=0)
     stdout: str = Field(default="")
     stderr: str = Field(default="")
-    status: StatusEnum = Field(examples=[StatusEnum.todo])
+    status: StatusEnum = Field(default=StatusEnum.doing, examples=[StatusEnum.todo])
     draw_image_url: Optional[str] = Field(default="/images/default.png", examples=["/images/default.png"])
     time: datetime = Field(default=datetime.now())
-    challenge_id: int
-    round_id: int
+    challenge_id: int = Field()
+    round_id: int = Field()
 
 
 class SubmissionSubmitCodeRequest(BaseModel):
     code: str = Field(default="")
-    team: int
-    challenge: int
+    team: int = Field()
+    challenge: int = Field()
 
     class Config:
         from_attributes = True
 
 
 class SubmissionSubmitCodeResponse(BaseModel):
-    challenge: int
+    challenge: int = Field()
     code: str = Field(default="")
     draw_image_url: Optional[str] = Field(default="/images/default.png", examples=["/images/default.png"])
-    round: int
-    status: StatusEnum = Field(examples=[StatusEnum.todo])
-    team: int
+    round: int = Field()
+    status: StatusEnum = Field(default=StatusEnum.doing, examples=[StatusEnum.todo])
+    team: int = Field()
     time: datetime = Field(default=datetime.now())
 
 
 class SubmissionTeamRecordResponse(BaseModel):
-    team_id: int
+    id: int = Field()
+    team_id: int = Field()
     stderr: str = Field(default="")
-    challenge_id: int
-    round_id: int
-    status: StatusEnum = Field(examples=[StatusEnum.todo])
+    challenge_id: int = Field()
+    round_id: int = Field()
+    status: StatusEnum = Field(default=StatusEnum.todo, examples=[StatusEnum.todo])
     code: str = Field(default="")
-    execute_time: Optional[timedelta] = Field(examples=[0], gt=0)
-    score: Optional[conint(ge=0, le=100)] = 0
+    execute_time: Optional[timedelta] = Field(examples=[0], ge=0)
+    score: int = Field(default=0, examples=[0], ge=0, le=100)
     stdout: str = Field(default="")
     draw_image_url: Optional[str] = Field(default="/images/default.png", examples=["/images/default.png"])
-    id: int
-    fitness: int = Field(examples=[0], gt=0)
+    fitness: int = Field(default=0, examples=[0], ge=0, le=100)
     time: datetime = Field(default=datetime.now())
-    word_count: int = Field(examples=[0], gt=0)
+    word_count: int = Field(default=0, examples=[0], ge=0)

@@ -1,4 +1,4 @@
-from src.models.enums import StatusEnum,DifficultyEnum
+from src.models.enums import StatusEnum, DifficultyEnum
 from pydantic import BaseModel, Field
 from tortoise.contrib.pydantic import pydantic_model_creator
 
@@ -14,16 +14,16 @@ class Challenge(BaseModel):
     title: str = Field(examples=["題目名稱"])
     description: str = Field(examples=["題目描述"])
     image_url: str = Field(default="/images/default.png")
-    difficulty: DifficultyEnum = Field(examples=[DifficultyEnum.easy])
-    round_id: int
+    difficulty: DifficultyEnum = Field(default=DifficultyEnum.easy, examples=[DifficultyEnum.easy])
+    round_id: int = Field()
     is_valid: bool = Field(examples=[True])
 
 
 class ChallengeTeamSubmissionResponse(BaseModel):
-    id: int
+    id: int = Field()
     title: str = Field(examples=["題目名稱"])
     description: str = Field(examples=["題目描述"])
-    round_id: int
+    round_id: int = Field()
     is_valid: bool = Field(examples=[True])
-    difficulty: DifficultyEnum = Field(examples=[DifficultyEnum.easy])
-    status: StatusEnum = Field(examples=[StatusEnum.todo])
+    difficulty: DifficultyEnum = Field(default=DifficultyEnum.easy, examples=[DifficultyEnum.easy])
+    status: StatusEnum = Field(default=StatusEnum.doing, examples=[StatusEnum.todo])

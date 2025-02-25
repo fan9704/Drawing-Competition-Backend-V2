@@ -2,9 +2,6 @@ from tortoise import fields, models
 
 
 class Challenge(models.Model):
-    """
-    挑戰 Model
-    """
     DIFFICULTY_OPTIONS = [
         ("easy", "easy"),
         ("medium", "medium"),
@@ -26,4 +23,4 @@ class Challenge(models.Model):
     is_valid = fields.BooleanField(default=True, description="是否有效")
 
     def __str__(self):
-        return f"題目:{self.id}-{self.description}"
+        return f"題目編號:{self.id}-標題；{self.title}-描述：{self.description}"

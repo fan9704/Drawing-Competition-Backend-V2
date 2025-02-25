@@ -20,7 +20,7 @@ class Round(BaseModel):
 
 
 class RoundChallengeResponse(BaseModel):
-    id: int
+    id: int = Field()
     start_time: datetime.datetime
     end_time: datetime.datetime
     is_valid: bool = Field(default=True,examples=[True])

@@ -9,8 +9,8 @@ from src.models.enums import StatusEnum
 
 
 class StatisticTeamChallengeScoreResponseDTO(BaseModel):
-    challenge: int
-    team_id: int
+    challenge: int = Field()
+    team_id: int = Field()
     max_score: int = Field(default=0, examples=[0], gt=0)
     submission: Optional[SubmissionOneLayerPydantic]
 
@@ -19,54 +19,54 @@ class StatisticTeamChallengeScoreResponseDTO(BaseModel):
 
 
 class StatisticTeamChallengeSubmissionCountResponseDTO(BaseModel):
-    challenge: int
-    submission_count: int = Field(default=0, examples=[1], lt=0)
+    challenge: int = Field()
+    submission_count: int = Field(default=0, examples=[1], ge=0)
 
 
 class StatisticTeamRoundTotalScoreResponseDTO(BaseModel):
-    round_id: int
-    team_id: int
-    total_score: int = Field(default=0, examples=[0], lt=0)
+    round_id: int = Field()
+    team_id: int = Field()
+    total_score: int = Field(default=0, examples=[0], ge=0)
 
 
 class StatisticAllTeamSingleRoundTotalScoreResponseDTO(BaseModel):
-    team_id: int
+    team_id: int = Field()
     team_name: str = Field(examples=["第1小隊"])
-    total_score: int = Field(default=0, examples=[0], lt=0)
+    total_score: int = Field(default=0, examples=[0], ge=0)
     score_list: List[int]
 
 
 class StatisticAllTeamRoundTotalScoreResponseDTO(BaseModel):
-    team_id: int
+    team_id: int = Field()
     team_name: str = Field(examples=["第1小隊"])
     round_id_list: List[int]
     total_score_list: List[int]
 
 
 class StatisticTop3TeamChallengeScoreResponseDTO(BaseModel):
-    team: int
+    team: int = Field()
     team_name: str = Field(examples=["第1小隊"])
-    max_score: int = Field(default=0, examples=[0], lt=0, gt=0)
-    fitness: Optional[float] = Field(default=0.0, examples=[21.3], lt=0.0, gt=0.0)
+    max_score: int = Field(default=0, examples=[0], ge=0)
+    fitness: Optional[float] = Field(default=0.0, examples=[21.3], ge=0.0, le=0.0)
     execute_time: Optional[timedelta]
-    word_count: Optional[int] = Field(default=0, examples=[0], lt=0)
+    word_count: Optional[int] = Field(default=0, examples=[0], ge=0)
 
 
 class StatisticOneLayerSubmissionResponseDTO(BaseModel):
-    id: int
-    team_id: int
-    score: Optional[int] = Field(default=0, examples=[0], lt=0)
+    id: int = Field()
+    team_id: int = Field()
+    score: int = Field(default=0, examples=[0], ge=0, le=100)
     code: str = Field(default="")
-    fitness: Optional[int] = Field(default=0, examples=[0], lt=0)
-    word_count: Optional[int] = Field(default=0, examples=[0], lt=0)
-    execution_time: Optional[int] = 0
+    fitness: Optional[int] = Field(default=0, examples=[0], ge=0)
+    word_count: Optional[int] = Field(default=0, examples=[0], ge=0)
+    execution_time: Optional[int] = Field(default=0, examples=[0])
     stdout: str = Field(default="")
     stderr: str = Field(default="")
-    status: StatusEnum = Field(examples=[StatusEnum.todo])
+    status: StatusEnum = Field(default=StatusEnum.doing, examples=[StatusEnum.todo])
     draw_image_url: Optional[str] = Field(default="images/default.png")
     time: datetime = Field(default=datetime.now())
-    challenge_id: int
-    round_id: int
+    challenge_id: int = Field()
+    round_id: int = Field()
 
 
 class StatisticFeaturedSubmissionResponseDTO(BaseModel):

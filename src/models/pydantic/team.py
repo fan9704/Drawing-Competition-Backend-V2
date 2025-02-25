@@ -8,7 +8,7 @@ TeamPydantic = pydantic_model_creator(ITeam)
 
 
 class Team(BaseModel):
-    id: int
+    id: int = Field()
     name: str = Field(examples=["第1小隊"])
 
 

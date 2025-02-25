@@ -1,14 +1,16 @@
-from typing import List,Type, TypeVar
+from typing import List, Type, TypeVar
 from abc import ABC, abstractmethod
 from tortoise import models
 
 T = TypeVar("T", bound=models.Model)
 
+
 class Repository(ABC):
     model: Type[T]
+
     # 初始化 給定 ORM 操作目標
     @abstractmethod
-    def __init__(self, model:T) -> None:
+    def __init__(self, model: T) -> None:
         raise NotImplementedError()
 
     # 建立物件
@@ -33,7 +35,7 @@ class Repository(ABC):
         return await obj.delete()
 
     # 單筆查詢
-    async def get_by_id(self, pk)->T:
+    async def get_by_id(self, pk) -> T:
         return await self.model.get(pk=pk)
 
     # 多筆查詢
@@ -41,5 +43,5 @@ class Repository(ABC):
         return await self.model.all()
 
     # 過濾
-    async def filter(self,**params)->List[T]:
+    async def filter(self, **params) -> List[T]:
         return await self.model.filter(**params)
