@@ -1,4 +1,5 @@
 from tortoise import fields, models, timezone
+from datetime import timedelta
 
 
 class Submission(models.Model):
@@ -40,7 +41,7 @@ class Submission(models.Model):
     # 程式字數
     word_count = fields.IntField(default=0, description="單字數")
     # 執行時間（使用 TimeDeltaField 來記錄時間間隔）
-    execute_time = fields.TimeDeltaField(default=0, null=True, description="執行時間")
+    execute_time = fields.TimeDeltaField(default=timedelta(seconds=3600), null=True, description="執行時間")
     # 輸出相關
     stdout = fields.TextField(default="", description="標準輸出")
     stderr = fields.TextField(default="", description="標準錯誤")

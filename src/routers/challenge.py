@@ -2,6 +2,7 @@ from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
 
+from src.utils.i18n import _
 from src.models.pydantic import ChallengeWithOutRelationPydantic
 from src.models.tortoise import Challenge as IChallenge
 from src.models.pydantic.challenge import Challenge, ChallengeTeamSubmissionResponse
@@ -9,12 +10,15 @@ from src.repositories import ChallengeRepository, SubmissionRepository
 
 router = APIRouter()
 
+
 # Repository 依賴
 def get_challenge_repository() -> ChallengeRepository:
     return ChallengeRepository()
 
+
 def get_submission_repository() -> SubmissionRepository:
     return SubmissionRepository()
+
 
 # 取得所有挑戰
 @router.get("/",
@@ -22,9 +26,10 @@ def get_submission_repository() -> SubmissionRepository:
             description="Get All Challenge",
             response_model=List[ChallengeWithOutRelationPydantic],
             response_description="All Challenge"
-)
+            )
 async def get_all_challenges(repository: ChallengeRepository = Depends(get_challenge_repository)):
     return await ChallengeWithOutRelationPydantic.from_queryset(repository.find_all())
+
 
 # 取得單一挑戰 (根據 ID)
 @router.get("/{pk}",
@@ -33,13 +38,14 @@ async def get_all_challenges(repository: ChallengeRepository = Depends(get_chall
             response_model=Challenge,
             response_description="Challenge")
 async def get_challenge_by_id(
-    pk: int,
-    repository: ChallengeRepository = Depends(get_challenge_repository)
+        pk: int,
+        repository: ChallengeRepository = Depends(get_challenge_repository)
 ) -> Challenge:
     challenge = await repository.find_by_id_with_round(pk=pk)
     if challenge:
         return challenge
-    raise HTTPException(status_code=400, detail="Challenge is not valid")
+    raise HTTPException(status_code=400, detail=_("Challenge is not valid"))
+
 
 # 根據 team_id 列出挑戰
 # TODO: Change Frontend Route
@@ -49,17 +55,17 @@ async def get_challenge_by_id(
             response_model=List[ChallengeTeamSubmissionResponse],
             response_description="Team Challenge Submission Status")
 async def list_challenges_by_team(
-    team_id: int = None,
-    repository: ChallengeRepository = Depends(get_challenge_repository),
-    submission_repository: SubmissionRepository = Depends(get_submission_repository),
+        team_id: int = None,
+        repository: ChallengeRepository = Depends(get_challenge_repository),
+        submission_repository: SubmissionRepository = Depends(get_submission_repository),
 ) -> List[ChallengeTeamSubmissionResponse]:
     if team_id is None:
-        raise HTTPException(status_code=400, detail="team_id is required")
+        raise HTTPException(status_code=400, detail=_("team_id is required"))
 
-    challenges:List[IChallenge] = await repository.filter()
+    challenges: List[IChallenge] = await repository.filter()
     challenge_status_list = []
     for challenge in challenges:
-        challenge_status =  await submission_repository.filter_submission_by_challenge(team_id, challenge)
+        challenge_status = await submission_repository.filter_submission_by_challenge(team_id, challenge)
         c_status = "todo"
         if challenge_status is not None:
             c_status = challenge_status.status
