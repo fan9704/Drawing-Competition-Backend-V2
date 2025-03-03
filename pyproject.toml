@@ -3,15 +3,15 @@ name = "drawing-competition-backend"
 version = "0.1.0"
 description = ""
 authors = [
-    {name = "fan9704",email = "cxz123499@gmail.com"}
+    {name = "fan9704",email = "gangtingfan0207@gmail.com"}
 ]
 readme = "README.md"
-requires-python = ">=3.11,<4.0"
+markers = 'sys_platform == "win32"'
+requires-python = ">=3.12,<4.0"
 dependencies = [
     "fastapi (>=0.115.8,<0.116.0)",
     "uvicorn (>=0.34.0,<0.35.0)",
     "tortoise-orm[psycopg] (>=0.24.0,<0.25.0)",
-    "betterconf (>=4.5.0,<5.0.0)",
     "pydantic (>=2.10.6,<3.0.0)",
     "loguru (>=0.7.3,<0.8.0)",
     "asyncpg (>=0.30.0,<0.31.0)",
@@ -21,10 +21,10 @@ dependencies = [
     "pillow (>=11.1.0,<12.0.0)",
     "sentence-transformers (>=3.4.1,<4.0.0)",
     "python-jose[cryptography] (>=3.3.0,<4.0.0)",
-    "numpy (>=2.2.2,<3.0.0)",
     "opencv-python (>=4.11.0.86,<5.0.0.0)",
     "psutil (>=6.1.1,<7.0.0)",
-    "ngrok (>=1.4.0,<2.0.0)",
+    "numpy (>=2.2.3,<3.0.0)",
+    "babel (>=2.17.0,<3.0.0)",
 ]
 
 
@@ -36,7 +36,6 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry]
 package-mode = false
 [tool.poetry.group.dev.dependencies]
-pytest = "^8.3.4"
-pytest-asyncio = "^0.25.3"
-pytest-cov = "^6.0.0"
-
+#pytest = "^8.3.4"
+#pytest-asyncio = "^0.25.3"
+#pytest-cov = "^6.0.0"
