@@ -1,7 +1,8 @@
 from typing import Optional
 
-from fastapi import APIRouter, Response, HTTPException
+from fastapi import APIRouter, HTTPException
 
+from src.utils.i18n import _
 from src.models.pydantic import Round, RoundChallengeResponse, ChallengePydantic
 from src.repositories import RoundRepository
 
@@ -31,10 +32,10 @@ async def get_all_rounds() -> Optional[RoundChallengeResponse]:
         )
     elif not await repository.check_valid_round_exists():
         # 檢查是否所有回合結束
-        raise HTTPException(status_code=204, detail="No Content")
+        raise HTTPException(status_code=204, detail=_("No Content"))
     else:
         # 檢查是否沒有開放回合
-        raise HTTPException(status_code=404, detail="No round available")
+        raise HTTPException(status_code=404, detail=_("No round available"))
 
 # RoundAPIView (單一回合檢視)
 @router.get("/{round_id}",
@@ -44,7 +45,8 @@ async def get_all_rounds() -> Optional[RoundChallengeResponse]:
             response_description="Round Information"
 )
 async def get_round(round_id: int) -> Optional[Round]:
+    print("===",_("Round not found"),"===")
     round_instance = await repository.get_by_id(round_id)
     if round_instance is None:
-        raise HTTPException(status_code=404, detail="Round not found")
+        raise HTTPException(status_code=404, detail=_("Round not found"))
     return round_instance
