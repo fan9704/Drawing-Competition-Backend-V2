@@ -1,6 +1,7 @@
 from typing import Optional
 
-from fastapi import APIRouter, Response, HTTPException
+from fastapi import APIRouter, HTTPException
+from fastapi_cache.decorator import cache
 
 from src.models.pydantic import Round, RoundChallengeResponse, ChallengePydantic
 from src.repositories import RoundRepository
@@ -15,6 +16,7 @@ repository: RoundRepository = RoundRepository()
             response_model=Optional[RoundChallengeResponse],
             response_description="Current Round Challenge"
 )
+@cache(expire=10)
 async def get_all_rounds() -> Optional[RoundChallengeResponse]:
     round_instance = await repository.get_current_round()
     if round_instance:
@@ -43,6 +45,7 @@ async def get_all_rounds() -> Optional[RoundChallengeResponse]:
             response_model=Round,
             response_description="Round Information"
 )
+@cache(expire=10)
 async def get_round(round_id: int) -> Optional[Round]:
     round_instance = await repository.get_by_id(round_id)
     if round_instance is None:
