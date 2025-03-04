@@ -16,8 +16,9 @@ from src.repositories.base import Repository
 from src.repositories.challenge import ChallengeRepository
 from src.repositories.team import TeamRepository
 
-challenge_repository:ChallengeRepository = ChallengeRepository()
-team_repository:TeamRepository = TeamRepository()
+challenge_repository: ChallengeRepository = ChallengeRepository()
+team_repository: TeamRepository = TeamRepository()
+
 
 class SubmissionRepository(Repository):
     def __init__(self):
@@ -56,8 +57,8 @@ class SubmissionRepository(Repository):
         return await qs.all()
 
     # 過濾傳入的 submissions，根據 Challenge 取得最新一筆 Submission
-    async def filter_submission_by_challenge(self, team_id:int, challenge: IChallenge):
-        return await self.model.filter(team__id=team_id,challenge=challenge).first()
+    async def filter_submission_by_challenge(self, team_id: int, challenge: IChallenge):
+        return await self.model.filter(team__id=team_id, challenge=challenge).first()
 
     # 計算該 Team ID 每個挑戰的最高分
     async def find_all_highest_submission_by_team_id(self, team_id: int):
@@ -67,7 +68,8 @@ class SubmissionRepository(Repository):
                 team__id=team_id,
                 challenge=challenge
             ).order_by("-score").first()
-            max_score = await self.model.filter(team__id=team_id,challenge=challenge).order_by("-score").first().values()
+            max_score = await self.model.filter(team__id=team_id, challenge=challenge).order_by(
+                "-score").first().values()
             if max_score is None:
                 max_score = 0
                 continue
@@ -84,10 +86,11 @@ class SubmissionRepository(Repository):
         return qs
 
     # 計算該 Team Id 提交每個挑戰次數
-    async def count_team_all_count_submission(self,team_id:int) -> List[StatisticTeamChallengeSubmissionCountResponseDTO]:
+    async def count_team_all_count_submission(self, team_id: int) -> List[
+        StatisticTeamChallengeSubmissionCountResponseDTO]:
         qs = []
         for challenge in await challenge_repository.find_all():
-            submission_count = await self.model.filter(team__id=team_id,challenge=challenge).count()
+            submission_count = await self.model.filter(team__id=team_id, challenge=challenge).count()
             res = StatisticTeamChallengeSubmissionCountResponseDTO(
                 challenge=challenge.id,
                 submission_count=submission_count,
@@ -96,10 +99,11 @@ class SubmissionRepository(Repository):
         return qs
 
     # 計算該 Team Id 該 Round Id 獲得總分
-    async def get_team_round_total_score(self,team_id:int,round_id:int):
+    async def get_team_round_total_score(self, team_id: int, round_id: int):
         total_score = 0
         for challenge in await challenge_repository.filter(round__id=round_id):
-            max_score = await self.model.filter(team__id=team_id,challenge=challenge).order_by("-score").first().values()
+            max_score = await self.model.filter(team__id=team_id, challenge=challenge).order_by(
+                "-score").first().values()
             if max_score is None:
                 break
             else:
@@ -111,7 +115,7 @@ class SubmissionRepository(Repository):
         )
 
     # 計算所有 Team 在所有 Round 的分數
-    async def get_team_all_challenge_score(self,round_id:int):
+    async def get_team_all_challenge_score(self, round_id: int):
         qs = []
         for team in await team_repository.find_all():
             score_list = []
@@ -131,11 +135,12 @@ class SubmissionRepository(Repository):
         return qs
 
     # 根據 Challenge ID 取得前三高的 Team
-    async def get_top3_challenge_score_by_team_id(self,challenge_id:int):
+    async def get_top3_challenge_score_by_team_id(self, challenge_id: int):
         qs = []
         team_list = set()
         challenge = await challenge_repository.get_by_id(challenge_id)
-        for submission in await self.model.filter(challenge=challenge).prefetch_related("team").order_by("-score").values():
+        for submission in await self.model.filter(challenge=challenge).prefetch_related("team").order_by(
+                "-score").values():
             if len(team_list) == 3:
                 break
             elif submission["team_id"] in team_list:
@@ -151,6 +156,7 @@ class SubmissionRepository(Repository):
             ))
             team_list.add(submission["team_id"])
         return qs
+
     # 取得每個 Round 的 Team Challenge 總分
     async def get_all_round_team_total_challenge_score(self):
         qs = []
@@ -158,7 +164,7 @@ class SubmissionRepository(Repository):
         for team in await ITeam.all().values():
             team_id = team["id"]
             team_name = team["name"]
-            round_id_list =[]
+            round_id_list = []
             total_score_list = []
             for round in await IRound.all().values():
                 round_id = round["id"]
@@ -181,18 +187,19 @@ class SubmissionRepository(Repository):
         return qs
 
     # 取得該 Team Id 該 Challenge ID 所有的 status=success 的提交紀錄
-    async def find_all_success_submission_by_challenge_id_and_team_id(self,challenge_id:int,team_id:int):
-        return await self.model.filter(challenge_id=challenge_id, team_id=team_id,status="success").values()
+    async def find_all_success_submission_by_challenge_id_and_team_id(self, challenge_id: int, team_id: int):
+        return await self.model.filter(challenge_id=challenge_id, team_id=team_id, status="success").values()
 
     # 取得該 Challenge Id 所有 Team 所有 status=success 的提交紀錄
-    async def find_all_team_success_submission_challenge_id(self,challenge_id:int):
+    async def find_all_team_success_submission_challenge_id(self, challenge_id: int):
         return await self.model.filter(challenge_id=challenge_id, status="success").order_by("team_id").values()
 
     # 列出各題目精選圖片
     async def find_all_challenge_featured_submission(self):
         qs = []
         for challenge in await challenge_repository.find_all():
-            submissions = await self.model.filter(challenge=challenge,status="success",score__gt=90).order_by("-score")
+            submissions = await self.model.filter(challenge=challenge, status="success", score__gt=90).order_by(
+                "-score")
             qs.append(
                 {
                     "challenge": challenge,
@@ -228,7 +235,8 @@ class SubmissionRepository(Repository):
         return await submissions.filter(challenge=challenge, score=score).first()
 
     # 計算傳入 submissions 中，根據 TeamId 與 Challenge 過濾後的 Submission 個數
-    async def count_submission_query_by_team_id_filter_by_challenge(self, submissions, team_id: int, challenge: IChallenge):
+    async def count_submission_query_by_team_id_filter_by_challenge(self, submissions, team_id: int,
+                                                                    challenge: IChallenge):
         if team_id is None:
             return await submissions.filter(challenge=challenge).count()
         else:
@@ -243,13 +251,13 @@ class SubmissionRepository(Repository):
         return await qs.all()
 
     # 建立暫時性的 Submission
-    async def create_temperate_submission(self, code:str,team_id:int,challenge_id:int):
+    async def create_temperate_submission(self, code: str, team_id: int, challenge_id: int):
         challenge = await IChallenge.get(id=challenge_id).prefetch_related("round")
         submission = await self.model.create(
-            code = code,
+            code=code,
             status="doing",
-            team_id = team_id,
-            challenge_id = challenge_id,
+            team_id=team_id,
+            challenge_id=challenge_id,
             round_id=challenge.round.id,
         )
         await submission.save()

@@ -7,18 +7,9 @@ from src.models.pydantic import ChallengeWithOutRelationPydantic
 from src.models.tortoise import Challenge as IChallenge
 from src.models.pydantic.challenge import Challenge, ChallengeTeamSubmissionResponse
 from src.repositories import ChallengeRepository, SubmissionRepository
+from src.dependencies import get_challenge_repository,get_submission_repository
 
 router = APIRouter()
-
-
-# Repository 依賴
-def get_challenge_repository() -> ChallengeRepository:
-    return ChallengeRepository()
-
-
-def get_submission_repository() -> SubmissionRepository:
-    return SubmissionRepository()
-
 
 # 取得所有挑戰
 @router.get("/",

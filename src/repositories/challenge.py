@@ -5,9 +5,11 @@ from src.models.tortoise import Challenge as IChallenge
 # 初始化 RoundRepository，並指定模型為 Round
 round_repository: RoundRepository = RoundRepository()
 
+
 class ChallengeRepository(Repository):
     def __init__(self):
         self.model = IChallenge
+
     async def find_by_id_with_round(self, pk: int):
         # 取得當前 Round
         current_round = await round_repository.get_current_round()
