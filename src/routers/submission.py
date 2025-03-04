@@ -13,17 +13,9 @@ from src.models.tortoise import Submission as ISubmission
 from src.repositories import ChallengeRepository
 from src.repositories import SubmissionRepository
 from src.utils.judge import judge_submission
+from src.dependencies import get_submission_repository, get_challenge_repository
 
 router = APIRouter()
-
-
-# Repository 依賴
-def get_challenge_repository() -> ChallengeRepository:
-    return ChallengeRepository()
-
-
-def get_submission_repository() -> SubmissionRepository:
-    return SubmissionRepository()
 
 
 # Store API - 更新 Submission
