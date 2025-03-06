@@ -47,7 +47,7 @@ class StatisticTop3TeamChallengeScoreResponseDTO(BaseModel):
     team: int = Field()
     team_name: str = Field(examples=["第1小隊"])
     max_score: int = Field(default=0, examples=[0], ge=0)
-    fitness: Optional[float] = Field(default=0.0, examples=[21.3], ge=0.0, le=0.0)
+    fitness: Optional[float] = Field(default=0.0, examples=[21.3], ge=0.0, le=100.0)
     execute_time: Optional[timedelta]
     word_count: Optional[int] = Field(default=0, examples=[0], ge=0)
 
