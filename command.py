@@ -22,6 +22,7 @@ postgres_port = os.getenv("POSTGRES_PORT")
 
 POSTGRES_DB_URL = f'postgres://{postgres_user}:{postgres_password}@{postgres_host}:{postgres_port}/{postgres_db}'
 
+
 async def init_db():
     """初始化 Tortoise ORM"""
     await Tortoise.init(
@@ -34,19 +35,23 @@ async def init_db():
 @app.command("create_teams")
 def create_teams():
     """建立 10 個小隊並生成對應的 token"""
+
     def generate_token():
         return ''.join(secrets.choice(string.ascii_letters + string.digits).upper() for _ in range(4))
 
     async def _create_team():
         await init_db()
         for i in range(1, 11):
-            team, _ = await Team.get_or_create(pk=i)
-            team.token = generate_token()
-            team.name = f"第{i}小隊"
-            await team.save()
+            team = await Team.get_or_none(pk=i)
+            if team is None:
+                team = await Team.create(
+                    token=generate_token(),
+                    name=f"第{i}小隊"
+                )
+                await team.save()
 
-            # team = await Team.create(name=f"第{i}小隊", token=generate_token())
-            typer.echo(f"✅ 成功建立小隊: {team.name} (Token: {team.token})")
+                # team = await Team.create(name=f"第{i}小隊", token=generate_token())
+                typer.echo(f"✅ 成功建立小隊: {team.name} (Token: {team.token})")
         await Tortoise.close_connections()
 
     run_async(_create_team())
@@ -80,14 +85,17 @@ def create_rounds():
                 else:
                     start_time = end_time + timedelta(minutes=ROUND_GAP_TIME)
                     end_time = start_time + timedelta(minutes=ROUND_PLAY_TIME)
-                round_instance, _ = await Round.get_or_create(pk=i)
-                round_instance.start_time = start_time
-                round_instance.end_time = end_time
-                round_instance.is_valid = False
-                await round_instance.save()
+                round_instance = await Round.get_or_none(pk=i)
+                if round_instance is None:
+                    round_instance = await Round.create(
+                        start_time=start_time,
+                        end_time=end_time,
+                        is_valid=False
+                    )
+                    await round_instance.save()
 
-                typer.echo(
-                    f"✅ 成功建立回合 {round_instance.id} - 開始: {round_instance.start_time} 結束: {round_instance.end_time}")
+                    typer.echo(
+                        f"✅ 成功建立回合 {round_instance.id} - 開始: {round_instance.start_time} 結束: {round_instance.end_time}")
 
     import asyncio
     asyncio.run(_create_rounds())

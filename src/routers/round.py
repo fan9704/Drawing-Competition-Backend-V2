@@ -1,13 +1,15 @@
 from typing import Optional
 
-from fastapi import APIRouter, HTTPException
 from fastapi_cache.decorator import cache
+from fastapi import APIRouter, Depends, HTTPException
 
+from src.utils.i18n import _
 from src.models.pydantic import Round, RoundChallengeResponse, ChallengePydantic
+from src.dependencies import get_round_repository
 from src.repositories import RoundRepository
 
 router = APIRouter()
-repository: RoundRepository = RoundRepository()
+
 
 # RoundListAPIView (列出所有回合)
 @router.get("/",
@@ -17,7 +19,8 @@ repository: RoundRepository = RoundRepository()
             response_description="Current Round Challenge"
 )
 @cache(expire=10)
-async def get_all_rounds() -> Optional[RoundChallengeResponse]:
+async def get_all_rounds(repository: RoundRepository = Depends(get_round_repository)) -> Optional[
+    RoundChallengeResponse]:
     round_instance = await repository.get_current_round()
     if round_instance:
         # 標註該 Round 已經進行過了
@@ -33,10 +36,11 @@ async def get_all_rounds() -> Optional[RoundChallengeResponse]:
         )
     elif not await repository.check_valid_round_exists():
         # 檢查是否所有回合結束
-        raise HTTPException(status_code=204, detail="No Content")
+        raise HTTPException(status_code=204, detail=_("No Content"))
     else:
         # 檢查是否沒有開放回合
-        raise HTTPException(status_code=404, detail="No round available")
+        raise HTTPException(status_code=404, detail=_("No round available"))
+
 
 # RoundAPIView (單一回合檢視)
 @router.get("/{round_id}",
@@ -44,10 +48,10 @@ async def get_all_rounds() -> Optional[RoundChallengeResponse]:
             description="Get Round Information",
             response_model=Round,
             response_description="Round Information"
-)
+
 @cache(expire=10)
-async def get_round(round_id: int) -> Optional[Round]:
+async def get_round(round_id: int, repository: RoundRepository = Depends(get_round_repository)) -> Optional[Round]:
     round_instance = await repository.get_by_id(round_id)
     if round_instance is None:
-        raise HTTPException(status_code=404, detail="Round not found")
+        raise HTTPException(status_code=404, detail=_("Round not found"))
     return round_instance
