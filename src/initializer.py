@@ -1,9 +1,12 @@
 from inspect import getmembers
-
+from loguru import logger
 from fastapi import FastAPI
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.redis import RedisBackend
+from redis import asyncio as aioredis
 from tortoise.contrib.starlette import register_tortoise
 from fastapi.staticfiles import StaticFiles
-from src.configs import tortoise_config, GENERATE_DB_SCHEMA, ALLOW_ORIGINS
+from src.configs import tortoise_config, GENERATE_DB_SCHEMA, ALLOW_ORIGINS,REDIS_URL
 from src.utils.api.router import TypedAPIRouter
 from src.middlewares.language import LanguageMiddleware
 from fastapi.middleware.cors import CORSMiddleware
@@ -20,6 +23,7 @@ def init(app: FastAPI):
     # 初始化 Middleware
     init_i18n(app)
     init_cors(app)
+    init_redis(app)
     # 設定靜態文件的目錄（上傳檔案的存放位置）
     app.mount("/media", StaticFiles(directory="media"), name="media")
 
@@ -30,6 +34,10 @@ def init_exceptions_handlers(app: FastAPI):
 
     app.add_exception_handler(BaseORMException, tortoise_exception_handler)
 
+def init_redis(app:FastAPI):
+    logger.info("Setting up Redis")
+    redis = aioredis.from_url(REDIS_URL)
+    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
 
 def init_db(app: FastAPI):
     """

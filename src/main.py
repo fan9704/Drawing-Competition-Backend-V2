@@ -2,23 +2,25 @@
 Here you should do all needed actions. Standart configuration of docker container
 will run your application with this file.
 """
+from collections.abc import AsyncIterator
+
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from loguru import logger
-from src.configs import NGROK_EDGE, NGROK_AUTH_TOKEN
+from src.configs import NGROK_EDGE, NGROK_AUTH_TOKEN, APPLICATION_PORT
 import logging
 import ngrok
 import uvicorn
 
 logging.basicConfig(level="DEBUG")
-APPLICATION_PORT = 8000
+
 
 from src.configs import openapi_config
 from src.initializer import init
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     logger.info("Setting up Ngrok Tunnel")
     ngrok.set_auth_token(NGROK_AUTH_TOKEN)
     ngrok.forward(
@@ -35,6 +37,7 @@ app = FastAPI(
     title=openapi_config.name,
     version=openapi_config.version,
     description=openapi_config.description,
+    # lifespan=lifespan,
 )
 logger.info("Starting application initialization...")
 init(app)
