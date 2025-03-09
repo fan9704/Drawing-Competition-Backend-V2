@@ -7,6 +7,7 @@ DB_MODELS = ["src.models.tortoise"]
 POSTGRES_DB_URL = "postgres://{postgres_user}:{postgres_password}@{postgres_host}:{postgres_port}/{postgres_db}"
 SQLITE_DB_URL = "sqlite://:memory:"
 
+
 @betterconf(provider=DotenvProvider(auto_load=True))
 class PostgresSettings:
     """Postgres env values"""

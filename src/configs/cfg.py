@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+APPLICATION_PORT = 8000
+
 IS_TEST = bool(environ.get("API_TEST"))
 SECRET_KEY = environ.get("SECRET_KEY")
 API_ENDPOINT = environ.get("API_ENDPOINT", "http://localhost:8000")
@@ -16,6 +18,3 @@ ALLOW_ORIGINS = [
 
 DRAWING_TEMPLATE_PATH = "src/utils/judge_dir/drawing_code_template.py"
 MAIN_DRAWING_PATH = f"src/utils/judge_dir/main_drawing.py"
-
-NGROK_AUTH_TOKEN = environ.get("NGROK_AUTH_TOKEN", "")
-NGROK_EDGE = environ.get("NGROK_EDGE", "edge:edghts_")
