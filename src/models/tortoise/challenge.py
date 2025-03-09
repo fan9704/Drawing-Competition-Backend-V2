@@ -8,7 +8,7 @@ class Challenge(models.Model):
         ("hard", "hard"),
     ]
 
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     title = fields.CharField(max_length=255, default="題目標題", description="題目標題")
     description = fields.TextField(description="題目描述")
     # 注意：Tortoise 沒有內建的 ImageField，你可以將圖片路徑以字串儲存，
