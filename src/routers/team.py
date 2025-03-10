@@ -43,7 +43,7 @@ async def auth_team(request: TeamAuthRequest,
     token = None
 
     if team:
-        token = jwt.create_access_token(team)
+        token = jwt.create_team_access_token(team)
         status = True
     return TeamAuthResponse(
         status=status,
