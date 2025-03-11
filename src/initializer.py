@@ -5,7 +5,7 @@ from tortoise.contrib.starlette import register_tortoise
 from fastapi.staticfiles import StaticFiles
 from src.configs import tortoise_config, GENERATE_DB_SCHEMA, ALLOW_ORIGINS
 from src.utils.api.router import TypedAPIRouter
-from src.middlewares.language import LanguageMiddleware
+from src.middlewares import LanguageMiddleware,LogMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 
 
@@ -75,6 +75,7 @@ def init_routers(app: FastAPI):
 
 def init_i18n(app: FastAPI):
     app.add_middleware(LanguageMiddleware)
+    app.add_middleware(LogMiddleware)
 
 
 def init_cors(app: FastAPI):

@@ -4,13 +4,14 @@ will run your application with this file.
 """
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
-from loguru import logger
+# from loguru import logger
 from src.configs import NGROK_EDGE, NGROK_AUTH_TOKEN
-import logging
+from src.utils.logger import logger
+# import logging
 import ngrok
 import uvicorn
 
-logging.basicConfig(level="DEBUG")
+# logging.basicConfig(level="DEBUG")
 APPLICATION_PORT = 8000
 
 from src.configs import openapi_config
@@ -19,7 +20,7 @@ from src.initializer import init
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger.info("Setting up Ngrok Tunnel")
+    # logger.info("Setting up Ngrok Tunnel")
     ngrok.set_auth_token(NGROK_AUTH_TOKEN)
     ngrok.forward(
         addr=APPLICATION_PORT,
@@ -27,7 +28,7 @@ async def lifespan(app: FastAPI):
         proto="labeled",
     )
     yield
-    logger.info("Tearing Down Ngrok Tunnel")
+    # logger.info("Tearing Down Ngrok Tunnel")
     ngrok.disconnect()
 
 
@@ -41,4 +42,4 @@ init(app)
 logger.success("Successfully initialized!")
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=APPLICATION_PORT, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=APPLICATION_PORT,log_config=None, reload=True)
