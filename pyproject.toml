@@ -27,17 +27,18 @@ dependencies = [
     "fastapi-cache2[redis] (>=0.2.2,<0.3.0)",
     "numpy (>=2.2.3,<3.0.0)",
     "babel (>=2.17.0,<3.0.0)",
+    "docker (>=7.1.0,<8.0.0)",
+    "testcontainers (>=4.9.1,<5.0.0)",
 ]
 
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
-#poetry config virtualenvs.in-project true
 
 [tool.poetry]
 package-mode = false
 [tool.poetry.group.dev.dependencies]
-#pytest = "^8.3.4"
-#pytest-asyncio = "^0.25.3"
-#pytest-cov = "^6.0.0"
+pytest = "^8.3.5"
+pytest-asyncio = "^0.25.3"
+pytest-cov = "^6.0.0"
