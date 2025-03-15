@@ -3,7 +3,8 @@ import os
 import requests
 import platform
 
-API_ENDPOINT = os.environ.get("API_ENDPOINT","http://127.0.0.1:8000/api")
+API_ENDPOINT = os.environ.get("API_ENDPOINT", "http://127.0.0.1:8000/api")
+
 
 # 修改 Template
 def copy_and_modify_template(judge_template_path, template_revise_path, code_path):
@@ -27,18 +28,17 @@ def copy_and_modify_template(judge_template_path, template_revise_path, code_pat
 
 
 def run_code(
-    code_path,
-    image_url,
-    result_path,
-    team_id,
-    drawing_template_path,
-    main_drawing_path,
-    template_revise_path,
-    submission_id,
+        code_path,
+        image_url,
+        result_path,
+        team_id,
+        drawing_template_path,
+        main_drawing_path,
+        template_revise_path,
+        submission_id,
 ):
-
     result_dir = os.path.dirname(result_path)
-    ps_file =  f"media/result/ps/{submission_id}.ps"
+    ps_file = f"media/result/ps/{submission_id}.ps"
     if os.path.isfile(ps_file):
         # Remove the file
         os.remove(ps_file)
@@ -48,7 +48,6 @@ def run_code(
     os.makedirs("media/result/ps", exist_ok=True)
 
     copy_and_modify_template(drawing_template_path, template_revise_path, code_path)
-    print(f"template revise path: {template_revise_path}")
     # 檢查作業系統
     python_runner = "python3"
     if platform.system() == "Windows":
@@ -57,18 +56,7 @@ def run_code(
     # Run the provided Python script to generate the PostScript file
     # Use check to raise an exception if the script fails
     try:
-        print(
-            "MAINDRAWING",
-            main_drawing_path,
-            ps_file,
-            submission_id,
-            code_path,
-            template_revise_path,
-            result_path,
-            image_url,
-            sep=" ",
-        )
-        p = subprocess.Popen(
+        subprocess.Popen(
             [
                 python_runner,
                 str(main_drawing_path),
@@ -86,32 +74,28 @@ def run_code(
             "score": 0,
             "fitness": 0,
             "word_count": 0,
-            "execution_time": 0,
-            "stdout": "",
-            "stderr": "Process crashed with the following error message :\n\n" + e,
+            "execute_time": 0,
+            "stdout": e.stdout,
+            "stderr": e.stderr,
             "status": "fail",
         }
-        res = requests.post(
+        requests.post(
             f"{API_ENDPOINT}/submission/store/{submission_id}/",
             json=error_data,
         )
 
-        print(f"Error: {e}")
-
 
 def judge_submission(
-    code_path,
-    image_url,
-    result_path,
-    team_id,
-    drawing_template_path,
-    main_drawing_path,
-    template_revise_path,
-    submission_id,
+        code_path,
+        image_url,
+        result_path,
+        team_id,
+        drawing_template_path,
+        main_drawing_path,
+        template_revise_path,
+        submission_id,
 ):
-
     image_url = f".{image_url}"
-    print(f"image_url: {image_url}\n\n")
 
     run_code(
         code_path,

@@ -31,7 +31,7 @@ async def store_submission(pk: int, data: SubmissionStoreJudgeRequest,
     submission.score = data.score
     submission.fitness = data.fitness
     submission.word_count = data.word_count
-    submission.execute_time = datetime.timedelta(seconds=data.execution_time)
+    submission.execute_time = datetime.timedelta(seconds=data.execute_time)
     submission.stdout = data.stdout
     submission.stderr = data.stderr
     submission.status = data.status

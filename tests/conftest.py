@@ -5,10 +5,11 @@ from typing import Generator
 
 import pytest
 import pytest_asyncio
+from httpx import AsyncClient, ASGITransport
 from dotenv import load_dotenv
 from testcontainers.postgres import PostgresContainer
 from tortoise import Tortoise
-from tortoise.contrib.test import _init_db, getDBConfig
+from tortoise.contrib.test import getDBConfig
 
 load_dotenv()
 
@@ -36,8 +37,8 @@ def event_loop() -> Generator[AbstractEventLoop, None, None]:
     loop.close()
 
 
-# @pytest.fixture(scope="session")
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
+# @pytest.fixture(scope="module")
 def postgres_container():
     """使用 Testcontainers 啟動 PostgreSQL"""
     container = PostgresContainer("postgres:15")
@@ -46,8 +47,8 @@ def postgres_container():
     container.stop()  # 測試結束後停止容器
 
 
-# @pytest.fixture(scope="session")
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
+# @pytest.fixture(scope="module")
 def in_memory_db(request, event_loop, postgres_container):
     config = getDBConfig(
         app_label="models",
@@ -72,6 +73,13 @@ def in_memory_db(request, event_loop, postgres_container):
 
     request.addfinalizer(finalizer)
     # request.addfinalizer(lambda: event_loop.run_until_complete(Tortoise._drop_databases()))
+
+
+@pytest_asyncio.fixture(scope="module")
+async def http_client() -> AsyncClient:
+    from src.main import app
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://127.0.0.1") as client:
+        yield client
 
 
 @pytest_asyncio.fixture(scope="session")

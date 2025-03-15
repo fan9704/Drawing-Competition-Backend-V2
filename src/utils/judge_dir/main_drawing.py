@@ -11,9 +11,10 @@ import requests
 from PIL import Image
 from sentence_transformers import util
 
-API_ENDPOINT = os.environ.get("API_ENDPOINT","http://127.0.0.1:8000/api")
+API_ENDPOINT = os.environ.get("API_ENDPOINT", "http://127.0.0.1:8000/api")
 
-def piecewise_function(x:float, k:float=0.24)->float:
+
+def piecewise_function(x: float, k: float = 0.24) -> float:
     # Apply the sigmoid function for x > 80
     sigmoid_part = 100 / (1 + np.exp(-k * (x - 78)))
     # Apply the linear function for x <= 80
@@ -27,7 +28,7 @@ def piecewise_function(x:float, k:float=0.24)->float:
         return linear_part
 
 
-def get_word_count(file_path:str)->int:
+def get_word_count(file_path: str) -> int:
     with open(file_path, "r") as file:
         content = file.read()
         words = content.split()
@@ -38,14 +39,14 @@ def linear_normalize(value, min_value, max_value):
     return (value - min_value) / (max_value - min_value)
 
 
-def convert_ps_to_png(ps_file:str, png_file:str)->str:
+def convert_ps_to_png(ps_file: str, png_file: str) -> str:
     # Ensure the output directory exists
     # Open the PostScript file and convert it to a PNG file
     img = Image.open(ps_file)
     img.save(png_file)
 
 
-def extract_object(image_path:str):
+def extract_object(image_path: str):
     image = cv2.imread(image_path)
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     _, thresh = cv2.threshold(gray, 1, 255, cv2.THRESH_BINARY)
@@ -84,12 +85,12 @@ def calculate_pixel_difference_similarity(image1_path, image2_path):
             valid_pixel += 1
             if abs(img1[i][j] - img2[i][j]) <= THRESHOLD:
                 similar_pixel += 1
-    print("similar_pixel: ", similar_pixel)
+    # print("similar_pixel: ", similar_pixel)
     pixel_similarity = similar_pixel / valid_pixel
     return pixel_similarity
 
 
-def calculate_clip_similarity(model, image1_path:str, image2_path:str):
+def calculate_clip_similarity(model, image1_path: str, image2_path: str):
     # Encode the images
     original_image = Image.open(image1_path)
     drawn_image = Image.open(image2_path)
@@ -108,7 +109,7 @@ def calculate_clip_similarity(model, image1_path:str, image2_path:str):
     return similarity
 
 
-def judge_logic(image_url:str, result_path:str, word_count:int, execution_time:float):
+def judge_logic(image_url: str, result_path: str, word_count: int, execution_time: float):
     pixel_similarity = calculate_pixel_difference_similarity(image_url, result_path)
     print("origin pixel_similarity: ", pixel_similarity)
     pixel_similarity = min(1, linear_normalize(pixel_similarity, 0, 0.025))
@@ -167,14 +168,14 @@ if __name__ == "__main__":
         python_runner = "python"
     # 回傳資料
     data = {
-            "score": 0,
-            "fitness": 0,
-            "word_count": 0,
-            "execution_time": 0,
-            "stdout": "",
-            "stderr": "",
-            "status": "fail",
-        }
+        "score": 0,
+        "fitness": 0,
+        "word_count": 0,
+        "execution_time": 0,
+        "stdout": "",
+        "stderr": "",
+        "status": "fail",
+    }
     try:
         print('##%%$$ Running code template')
         result = subprocess.run(
@@ -186,7 +187,7 @@ if __name__ == "__main__":
         )
 
     except subprocess.CalledProcessError as e:
-        data["stderr"]= "Process crashed with the following error message :\n\n" + str(e)
+        data["stderr"] = "Process crashed with the following error message :\n\n" + str(e)
         data["status"] = "fail"
         res = requests.post(
             f"{API_ENDPOINT}/submission/store/{submission_id}/",
@@ -198,7 +199,7 @@ if __name__ == "__main__":
         print(f'ERROR: {e.stderr}')
         exit()
     except subprocess.TimeoutExpired as e:
-        data["stderr"]= "Time Limit Exceeded"
+        data["stderr"] = "Time Limit Exceeded"
         data["status"] = "fail"
         res = requests.post(
             f"{API_ENDPOINT}/submission/store/{submission_id}/",
