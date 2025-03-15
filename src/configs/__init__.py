@@ -1,7 +1,8 @@
 """Config of application"""
-from .db import TortoiseSettings
-from .openapi import OpenAPISettings
+from src.configs.db import TortoiseSettings
+from src.configs.openapi import OpenAPISettings
 from src.configs.cfg import *
+from src.configs.jwt import *
 
 tortoise_config = TortoiseSettings.generate()
 openapi_config = OpenAPISettings()

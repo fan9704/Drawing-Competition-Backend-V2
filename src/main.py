@@ -2,9 +2,11 @@
 Here you should do all needed actions. Standart configuration of docker container
 will run your application with this file.
 """
+from collections.abc import AsyncIterator
+
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
-from loguru import logger
+from loguru import loggert
 from src.configs import openapi_config, APPLICATION_PORT
 from src.initializer import init
 import logging
@@ -23,6 +25,7 @@ app = FastAPI(
     title=openapi_config.name,
     version=openapi_config.version,
     description=openapi_config.description,
+    # lifespan=lifespan,
 )
 logger.info("Starting application initialization...")
 init(app)
