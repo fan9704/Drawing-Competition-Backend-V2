@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 from tortoise.contrib.pydantic import pydantic_model_creator
 from src.models.tortoise import Team as ITeam
 
-TeamPydanticWithoutToken = pydantic_model_creator(ITeam, exclude=("token",))
+TeamPydanticWithoutToken = pydantic_model_creator(ITeam, exclude=("token", "submissions"))
 TeamPydantic = pydantic_model_creator(ITeam)
 
 

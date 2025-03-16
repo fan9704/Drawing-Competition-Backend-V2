@@ -48,7 +48,7 @@ async def get_all_rounds(repository: RoundRepository = Depends(get_round_reposit
             description="Get Round Information",
             response_model=Round,
             response_description="Round Information"
-
+            )
 @cache(expire=10)
 async def get_round(round_id: int, repository: RoundRepository = Depends(get_round_repository)) -> Optional[Round]:
     round_instance = await repository.get_by_id(round_id)

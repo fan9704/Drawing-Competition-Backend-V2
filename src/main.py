@@ -6,7 +6,7 @@ from collections.abc import AsyncIterator
 
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
-from loguru import loggert
+from loguru import logger
 from src.configs import openapi_config, APPLICATION_PORT
 from src.initializer import init
 import logging
