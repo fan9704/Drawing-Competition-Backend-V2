@@ -11,6 +11,8 @@ from testcontainers.postgres import PostgresContainer
 from tortoise import Tortoise
 from tortoise.contrib.test import getDBConfig
 
+from tests.common import setup_test_logger
+
 load_dotenv()
 
 # DB Config
@@ -74,6 +76,12 @@ def in_memory_db(request, event_loop, postgres_container):
     request.addfinalizer(finalizer)
     # request.addfinalizer(lambda: event_loop.run_until_complete(Tortoise._drop_databases()))
 
+@pytest.fixture()
+def logger(request):
+    """動態產生 Logger，名稱與當前測試函式對應"""
+    test_name = request.node.name
+    logger = setup_test_logger(test_name)
+    return logger
 
 @pytest_asyncio.fixture(scope="module")
 async def http_client() -> AsyncClient:
