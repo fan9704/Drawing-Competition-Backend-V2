@@ -12,7 +12,7 @@ from src.dependencies import get_submission_repository
 from src.services.statistic import (
     find_all_highest_submission_by_team_id,
     count_team_all_count_submission,
-    get_team_round_total_score,
+    get_team_by_team_id_round_total_score,
     get_all_round_team_total_challenge_score,
     get_team_all_challenge_score,
     get_top3_challenge_score_by_team_id,
@@ -59,7 +59,7 @@ async def get_team_challenge_submission_count(team_id: Optional[int] = Query(Non
 async def get_team_round_total_score(round_id: int = Path(...), team_id: Optional[int] = Query(None),
                                      repository: SubmissionRepository = Depends(
                                          get_submission_repository)) -> StatisticTeamRoundTotalScoreResponseDTO:
-    team_round_total_score = await get_team_round_total_score(team_id, round_id)
+    team_round_total_score = await get_team_by_team_id_round_total_score(team_id, round_id)
     return team_round_total_score
 
 

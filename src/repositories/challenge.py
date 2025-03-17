@@ -23,6 +23,3 @@ class ChallengeRepository(Repository):
 
     async def get_challenge_by_id_prefetch_round(self,pk:int):
         return await self.model.get(pk=pk).prefetch_related("round")
-
-    def find_all(self):
-        return self.model.all()

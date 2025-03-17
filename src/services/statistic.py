@@ -29,15 +29,13 @@ async def find_all_submission_query_by_team_id_order_by_challenge_and_reverse_ti
 # 計算該 Team ID 每個挑戰的最高分
 async def find_all_highest_submission_by_team_id(team_id: int):
     qs = []
-    for challenge in challenge_repository.find_all():
+    for challenge in await challenge_repository.find_all():
         max_score_submission = await repository.find_max_score_submission_by_challenge_id_and_team_id(
             team_id=team_id,
             challenge_id=challenge.id
         )
-
         max_score = await repository.get_submission_highest_score_by_team_and_challenge(team_id, challenge.id)
         if max_score is None:
-            max_score = 0
             continue
         else:
             max_score = max_score["score"]
@@ -56,7 +54,7 @@ async def find_all_highest_submission_by_team_id(team_id: int):
 async def count_team_all_count_submission(team_id: int) -> List[
     StatisticTeamChallengeSubmissionCountResponseDTO]:
     qs = []
-    for challenge in challenge_repository.find_all():
+    for challenge in await challenge_repository.find_all():
         submission_count = await repository.count_submission_by_team_id_and_challenge_id(
             team_id=team_id,
             challenge_id=challenge.id
@@ -70,7 +68,7 @@ async def count_team_all_count_submission(team_id: int) -> List[
 
 
 # 計算該 Team Id 該 Round Id 獲得總分
-async def get_team_round_total_score(team_id: int, round_id: int) -> StatisticTeamRoundTotalScoreResponseDTO:
+async def get_team_by_team_id_round_total_score(team_id: int, round_id: int) -> StatisticTeamRoundTotalScoreResponseDTO:
     total_score = 0
     for challenge in await challenge_repository.filter(round__id=round_id):
         max_score = await repository.get_submission_highest_score_by_team_and_challenge(
@@ -124,7 +122,7 @@ async def get_top3_challenge_score_by_team_id(challenge_id: int):
         team = await team_repository.get_by_id(pk=submission["team_id"])
         qs.append(StatisticTop3TeamChallengeScoreResponseDTO(
             team=submission["team_id"],
-            team_name=team["name"],
+            team_name=team.name,
             max_score=submission["score"],
             fitness=submission["fitness"],
             execute_time=submission["execute_time"],
@@ -139,12 +137,12 @@ async def get_all_round_team_total_challenge_score():
     qs = []
 
     for team in await team_repository.find_all():
-        team_id = team["id"]
-        team_name = team["name"]
+        team_id = team.id
+        team_name = team.name
         round_id_list = []
         total_score_list = []
         for round_instance in await round_repository.find_all():
-            round_id = round_instance["id"]
+            round_id = round_instance.id
             total_score = 0
             for challenge in await challenge_repository.filter(round__id=round_id):
                 max_score = await repository.get_submission_highest_score_by_team_and_challenge(
@@ -169,7 +167,7 @@ async def get_all_round_team_total_challenge_score():
 # 列出各題目精選圖片
 async def find_all_challenge_featured_submission():
     qs = []
-    for challenge in challenge_repository.find_all():
+    for challenge in await challenge_repository.find_all():
         submissions = await repository.find_all_more_90_submission_by_challenge_id_and_success_desc_order_by_score(
             challenge_id=challenge.id
         )

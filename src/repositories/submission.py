@@ -78,36 +78,14 @@ class SubmissionRepository(Repository):
         else:
             return await self.model.filter(team__id=team_id)
 
-    # 過濾傳入的 submissions，取出各 Challenge 的最高分
-    async def get_submission_highest_score(self, submissions):
-        qs = submissions.annotate(max_score=Max("score")).group_by("challenge")
-        return await qs.values("challenge", "max_score")
-
     # 取得根據 team_id 與 challenge_id 最高分 submission
     async def get_submission_highest_score_by_team_and_challenge(self, team_id: int, challenge_id: int):
         return await self.model.filter(team__id=team_id, challenge__id=challenge_id).order_by("-score").first().values()
-
-    # 過濾傳入的 submissions，根據 Round 與 Team 取出各 Challenge 的最高分
-    async def get_submission_highest_score_by_round_and_team(self, submissions, round_obj: IRound, team: ITeam):
-        qs = submissions.filter(round=round_obj, team=team).annotate(max_score=Max("score")).group_by("challenge")
-        return await qs.values("challenge", "max_score")
 
     # 過濾傳入的 submissions，取出各 Challenge 的最高分，並回傳 Team、fitness、execute_time 與 word_count 等資訊
     async def get_submission_highest_score_with_full_record(self, submissions):
         qs = submissions.annotate(max_score=Max("score")).group_by("team").order_by("-max_score")
         return await qs.values("team", "fitness", "execute_time", "max_score", "word_count")
-
-    # 過濾傳入的 submissions，根據 Challenge 與 Score 取出一筆 Submission
-    async def filter_submission_by_challenge_and_score(self, submissions, challenge, score):
-        return await submissions.filter(challenge=challenge, score=score).first()
-
-    # 計算傳入 submissions 中，根據 TeamId 與 Challenge 過濾後的 Submission 個數
-    async def count_submission_query_by_team_id_filter_by_challenge(self, submissions, team_id: int,
-                                                                    challenge: IChallenge):
-        if team_id is None:
-            return await submissions.filter(challenge=challenge).count()
-        else:
-            return await submissions.filter(challenge=challenge, team_id=team_id).count()
 
     # 計算 submission 數量 根據 team_id 與 challenge_id
     async def count_submission_by_team_id_and_challenge_id(self, team_id: int, challenge_id: int):
