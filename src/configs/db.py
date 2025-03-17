@@ -1,21 +1,17 @@
 """Config of DB"""
-from betterconf import betterconf, field, DotenvProvider
+import os
 
 from src.configs.cfg import IS_TEST
 
+# DB Config
+POSTGRES_USER = os.getenv("POSTGRES_USER")
+POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
+POSTGRES_HOST = os.getenv("POSTGRES_HOST")
+POSTGRES_PORT = os.getenv("POSTGRES_PORT")
+POSTGRES_DB = os.getenv("POSTGRES_TEST_DB")
+POSTGRES_DB_URL = f"postgres://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
 DB_MODELS = ["src.models.tortoise"]
-POSTGRES_DB_URL = "postgres://{postgres_user}:{postgres_password}@{postgres_host}:{postgres_port}/{postgres_db}"
 SQLITE_DB_URL = "sqlite://:memory:"
-
-@betterconf(provider=DotenvProvider(auto_load=True))
-class PostgresSettings:
-    """Postgres env values"""
-
-    postgres_user: str = field("POSTGRES_USER", default="postgres")
-    postgres_password: str = field("POSTGRES_PASSWORD", default="postgres")
-    postgres_db: str = field("POSTGRES_DB", default="mydb")
-    postgres_port: str = field("POSTGRES_PORT", default="5432")
-    postgres_host: str = field("POSTGRES_HOST", default="postgres")
 
 
 class TortoiseSettings:
@@ -33,8 +29,6 @@ class TortoiseSettings:
         if IS_TEST:
             db_url = SQLITE_DB_URL
         else:
-            postgres = PostgresSettings()
-            db_url = POSTGRES_DB_URL.format(**vars(postgres))
-            del postgres
+            db_url = POSTGRES_DB_URL
         modules = {"models": DB_MODELS}
         return TortoiseSettings(db_url=db_url, modules=modules, generate_schemas=True)

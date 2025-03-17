@@ -5,7 +5,7 @@ tz = pytz.timezone("Asia/Taipei")
 
 
 class Round(models.Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     start_time = fields.DatetimeField(null=False, description="開始時間")
     end_time = fields.DatetimeField(null=False, description="結束時間")
     is_valid = fields.BooleanField(default=True, description="是否有效")

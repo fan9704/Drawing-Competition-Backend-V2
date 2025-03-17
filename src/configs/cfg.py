@@ -19,7 +19,4 @@ ALLOW_ORIGINS = [
 DRAWING_TEMPLATE_PATH = "src/utils/judge_dir/drawing_code_template.py"
 MAIN_DRAWING_PATH = f"src/utils/judge_dir/main_drawing.py"
 
-NGROK_AUTH_TOKEN = environ.get("NGROK_AUTH_TOKEN", "")
-NGROK_EDGE = environ.get("NGROK_EDGE", "edge:edghts_")
-
 REDIS_URL = environ.get("REDIS_URL")

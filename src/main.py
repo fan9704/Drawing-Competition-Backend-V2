@@ -7,30 +7,18 @@ from collections.abc import AsyncIterator
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from loguru import logger
-from src.configs import NGROK_EDGE, NGROK_AUTH_TOKEN, APPLICATION_PORT
+from src.configs import openapi_config, APPLICATION_PORT
+from src.initializer import init
 import logging
-import ngrok
 import uvicorn
 
 logging.basicConfig(level="DEBUG")
 
 
-from src.configs import openapi_config
-from src.initializer import init
-
-
 @asynccontextmanager
-async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-    logger.info("Setting up Ngrok Tunnel")
-    ngrok.set_auth_token(NGROK_AUTH_TOKEN)
-    ngrok.forward(
-        addr=APPLICATION_PORT,
-        labels=NGROK_EDGE,
-        proto="labeled",
-    )
+async def lifespan(app: FastAPI):
+    logger.info("Setting up")
     yield
-    logger.info("Tearing Down Ngrok Tunnel")
-    ngrok.disconnect()
 
 
 app = FastAPI(

@@ -1,3 +1,4 @@
+from tests.common.logger import setup_test_logger
 # import pytest
 # from tortoise import Tortoise
 # from src.configs import tortoise_config

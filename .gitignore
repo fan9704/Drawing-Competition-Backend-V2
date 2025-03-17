@@ -9,6 +9,9 @@ redis_insight_data
 ### IDEA
 .idea
 
+### LOG
+/logs
+
 ### Generate File
 /media/code
 /media/result
