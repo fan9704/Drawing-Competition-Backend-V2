@@ -17,7 +17,7 @@ router = APIRouter()
             description="Get Current Round Challenge",
             response_model=Optional[RoundChallengeResponse],
             response_description="Current Round Challenge"
-)
+            )
 @cache(expire=10)
 async def get_all_rounds(repository: RoundRepository = Depends(get_round_repository)) -> Optional[
     RoundChallengeResponse]:
@@ -51,7 +51,4 @@ async def get_all_rounds(repository: RoundRepository = Depends(get_round_reposit
             )
 @cache(expire=10)
 async def get_round(round_id: int, repository: RoundRepository = Depends(get_round_repository)) -> Optional[Round]:
-    round_instance = await repository.get_by_id(round_id)
-    if round_instance is None:
-        raise HTTPException(status_code=404, detail=_("Round not found"))
-    return round_instance
+    return await repository.get_by_id(round_id)

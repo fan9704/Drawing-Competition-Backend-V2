@@ -18,8 +18,11 @@ class ChallengeRepository(Repository):
         return await self.model.filter(pk=pk, round=current_round).first()
 
     async def get_round_by_challenge_id(self, pk: int):
-        challenge = await self.model.get(id=pk).prefetch_related("round")
+        challenge = await self.get_challenge_by_id_prefetch_round(pk=pk)
         return challenge.round.id
+
+    async def get_challenge_by_id_prefetch_round(self,pk:int):
+        return await self.model.get(pk=pk).prefetch_related("round")
 
     def find_all(self):
         return self.model.all()

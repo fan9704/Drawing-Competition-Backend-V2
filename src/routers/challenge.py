@@ -50,9 +50,6 @@ async def list_challenges_by_team(
         repository: ChallengeRepository = Depends(get_challenge_repository),
         submission_repository: SubmissionRepository = Depends(get_submission_repository),
 ) -> List[ChallengeTeamSubmissionResponse]:
-    if team_id is None:
-        raise HTTPException(status_code=400, detail=_("team_id is required"))
-
     challenges: List[IChallenge] = await repository.filter()
     challenge_status_list = []
     for challenge in challenges:

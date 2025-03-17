@@ -9,6 +9,15 @@ from src.models.pydantic.statistic import StatisticTeamChallengeScoreResponseDTO
     StatisticFeaturedSubmissionResponseDTO
 from src.repositories import SubmissionRepository
 from src.dependencies import get_submission_repository
+from src.services.statistic import (
+    find_all_highest_submission_by_team_id,
+    count_team_all_count_submission,
+    get_team_round_total_score,
+    get_all_round_team_total_challenge_score,
+    get_team_all_challenge_score,
+    get_top3_challenge_score_by_team_id,
+    find_all_challenge_featured_submission
+)
 
 router = APIRouter()
 
@@ -22,7 +31,7 @@ router = APIRouter()
 async def get_team_challenge_highest_score(team_id: Optional[int] = Query(None),
                                            repository: SubmissionRepository = Depends(get_submission_repository)) -> \
         List[StatisticTeamChallengeScoreResponseDTO]:
-    highest_scores = await repository.find_all_highest_submission_by_team_id(team_id)
+    highest_scores = await find_all_highest_submission_by_team_id(team_id)
     return highest_scores
 
 
@@ -38,7 +47,7 @@ async def get_team_challenge_submission_count(team_id: Optional[int] = Query(Non
                                               repository: SubmissionRepository = Depends(get_submission_repository)) -> \
         List[StatisticTeamChallengeSubmissionCountResponseDTO]:
     # TODO: Check Valid Team
-    team_submission_count = await repository.count_team_all_count_submission(team_id)
+    team_submission_count = await count_team_all_count_submission(team_id)
     return team_submission_count
 
 
@@ -50,7 +59,7 @@ async def get_team_challenge_submission_count(team_id: Optional[int] = Query(Non
 async def get_team_round_total_score(round_id: int = Path(...), team_id: Optional[int] = Query(None),
                                      repository: SubmissionRepository = Depends(
                                          get_submission_repository)) -> StatisticTeamRoundTotalScoreResponseDTO:
-    team_round_total_score = await repository.get_team_round_total_score(team_id, round_id)
+    team_round_total_score = await get_team_round_total_score(team_id, round_id)
     return team_round_total_score
 
 
@@ -62,7 +71,7 @@ async def get_team_round_total_score(round_id: int = Path(...), team_id: Optiona
             )
 async def get_team_round_all_teams(repository: SubmissionRepository = Depends(get_submission_repository)) -> List[
     StatisticAllTeamRoundTotalScoreResponseDTO]:
-    all_round_team_total_challenge_score = await repository.get_all_round_team_total_challenge_score()
+    all_round_team_total_challenge_score = await get_all_round_team_total_challenge_score()
     return all_round_team_total_challenge_score
 
 
@@ -73,9 +82,7 @@ async def get_team_round_all_teams(repository: SubmissionRepository = Depends(ge
             response_description="Round Team Score")
 async def get_all_team_single_round_total_score(round_id: int = Path(...), repository: SubmissionRepository = Depends(
     get_submission_repository)) -> List[StatisticAllTeamSingleRoundTotalScoreResponseDTO]:
-    # if not round_instance:
-    #     raise HTTPException(status_code=404, detail="Round not found")
-    all_team_total_score = await repository.get_team_all_challenge_score(round_id)
+    all_team_total_score = await get_team_all_challenge_score(round_id)
     return all_team_total_score
 
 
@@ -87,7 +94,7 @@ async def get_all_team_single_round_total_score(round_id: int = Path(...), repos
 async def get_top3_team_challenge_score(challenge_id: int = Path(...),
                                         repository: SubmissionRepository = Depends(get_submission_repository)) -> List[
     StatisticTop3TeamChallengeScoreResponseDTO]:
-    top3_team_challenge_score = await repository.get_top3_challenge_score_by_team_id(challenge_id)
+    top3_team_challenge_score = await get_top3_challenge_score_by_team_id(challenge_id)
     return top3_team_challenge_score
 
 
@@ -121,5 +128,5 @@ async def get_all_team_success_submission_challenge_id(challenge_id: int, reposi
             response_model=List[StatisticFeaturedSubmissionResponseDTO],
             response_description="Challenge All Team Submission Featured Pictures")
 async def get_all_challenge_featured_submission(repository: SubmissionRepository = Depends(get_submission_repository)):
-    all_challenge_featured_submission = await repository.find_all_challenge_featured_submission()
+    all_challenge_featured_submission = await find_all_challenge_featured_submission()
     return all_challenge_featured_submission

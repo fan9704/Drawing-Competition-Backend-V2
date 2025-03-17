@@ -14,6 +14,7 @@ from src.repositories import ChallengeRepository
 from src.repositories import SubmissionRepository
 from src.utils.judge import judge_submission
 from src.dependencies import get_submission_repository, get_challenge_repository
+from src.services.submission import create_temperate_submission
 
 router = APIRouter()
 
@@ -66,7 +67,7 @@ async def submit_code(request: SubmissionSubmitCodeRequest,
         if diff_time < 5:
             raise HTTPException(status_code=429, detail=_("Submission too fast"))
     # 開始進行 Judge 前處理
-    submission = await repository.create_temperate_submission(
+    submission = await create_temperate_submission(
         code=code,
         team_id=team_id,
         challenge_id=challenge_id,
@@ -150,5 +151,4 @@ async def get_highest_score_submission(challenge_id: int, team_id: int,
             )
 async def get_all_submissions_by_team(team_id: int,
                                       repository: SubmissionRepository = Depends(get_submission_repository)):
-    submissions = await repository.find_all_submission_by_team_id(team_id)
-    return submissions
+    return await repository.find_all_submission_by_team_id(team_id)

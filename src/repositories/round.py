@@ -16,9 +16,7 @@ class RoundRepository(Repository):
 
     # 檢查當前是否有有效 Round
     async def check_valid_round_exists(self):
-        exists = await self.model.filter(is_valid=False).exists()
-        print(">>>", exists)
-        return exists
+        return await self.model.filter(is_valid=False).exists()
 
     # 取得所有有效 Round
     async def find_all_valid_round(self):
