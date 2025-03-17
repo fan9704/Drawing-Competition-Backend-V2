@@ -13,8 +13,8 @@ from src.models.tortoise import Submission as ISubmission
 from src.repositories import ChallengeRepository
 from src.repositories import SubmissionRepository
 from src.utils.judge import judge_submission
-from src.dependencies import get_submission_repository, get_challenge_repository
-from src.services.submission import create_temperate_submission
+from src.dependencies import get_submission_repository, get_challenge_repository,get_submission_service
+from src.services.submission import SubmissionService
 
 router = APIRouter()
 
@@ -49,7 +49,9 @@ async def store_submission(pk: int, data: SubmissionStoreJudgeRequest,
              response_description="Score store full submission record")
 async def submit_code(request: SubmissionSubmitCodeRequest,
                       repository: SubmissionRepository = Depends(get_submission_repository),
-                      challenge_repository: ChallengeRepository = Depends(get_challenge_repository)):
+                      challenge_repository: ChallengeRepository = Depends(get_challenge_repository),
+                      service: SubmissionService = Depends(get_submission_service)
+                      ):
     # 取得需要的資料
     now = datetime.datetime.now()
     challenge_id = request.challenge
@@ -67,7 +69,7 @@ async def submit_code(request: SubmissionSubmitCodeRequest,
         if diff_time < 5:
             raise HTTPException(status_code=429, detail=_("Submission too fast"))
     # 開始進行 Judge 前處理
-    submission = await create_temperate_submission(
+    submission = await service.create_temperate_submission(
         code=code,
         team_id=team_id,
         challenge_id=challenge_id,
