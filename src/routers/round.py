@@ -1,12 +1,11 @@
 from typing import Optional
 
+from fastapi import APIRouter, Depends
 from fastapi_cache.decorator import cache
-from fastapi import APIRouter, Depends, HTTPException
 
-from src.utils.i18n import _
-from src.models.pydantic import Round, RoundChallengeResponse, ChallengePydantic
-from src.dependencies import get_round_repository
-from src.repositories import RoundRepository
+from src.dependencies import get_round_service
+from src.models.pydantic import Round, RoundChallengeResponse
+from src.services import RoundService
 
 router = APIRouter()
 
@@ -19,27 +18,9 @@ router = APIRouter()
             response_description="Current Round Challenge"
             )
 @cache(expire=10)
-async def get_all_rounds(repository: RoundRepository = Depends(get_round_repository)) -> Optional[
-    RoundChallengeResponse]:
-    round_instance = await repository.get_current_round()
-    if round_instance:
-        # 標註該 Round 已經進行過了
-        round_instance.is_valid = True
-        await round_instance.save()
-        challenges = await ChallengePydantic.from_queryset(round_instance.challenge_list.all())
-        return RoundChallengeResponse(
-            id=round_instance.id,
-            start_time=round_instance.start_time,
-            end_time=round_instance.end_time,
-            is_valid=round_instance.is_valid,
-            challenge_list=challenges
-        )
-    elif not await repository.check_valid_round_exists():
-        # 檢查是否所有回合結束
-        raise HTTPException(status_code=204, detail=_("No Content"))
-    else:
-        # 檢查是否沒有開放回合
-        raise HTTPException(status_code=404, detail=_("No round available"))
+async def get_all_rounds(service: RoundService = Depends(get_round_service)) -> (
+        Optional)[RoundChallengeResponse]:
+    return await service.get_all_rounds()
 
 
 # RoundAPIView (單一回合檢視)
@@ -50,5 +31,5 @@ async def get_all_rounds(repository: RoundRepository = Depends(get_round_reposit
             response_description="Round Information"
             )
 @cache(expire=10)
-async def get_round(round_id: int, repository: RoundRepository = Depends(get_round_repository)) -> Optional[Round]:
-    return await repository.get_by_id(round_id)
+async def get_round(round_id: int, service: RoundService = Depends(get_round_service)) -> Optional[Round]:
+    return await service.get_round(round_id)
